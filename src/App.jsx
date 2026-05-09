@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 
 // 멘토링·컨설팅 URL 상수 (작업 18: URL 상수화)
 const MENTORING_URLS = {
@@ -724,61 +724,61 @@ const FORMS = [
 const PERSONAS = {
   "A": {
     "title": "문과/비전공 전환자",
-    "desc": "전공과 다른 직무 지원. 공고 용어가 낯설다",
+    "desc": "전공과 다른 직무 지원 — 공고 용어를 빠르게 익히고 전이 가능한 역량 정리하기",
     "flow": "공고 수집 → 용어 분석 → 역량 비교 → 적합성 평가",
     "step0_warning": false
   },
   "B": {
     "title": "이공계 신입 (전공 일치)",
-    "desc": "용어는 알지만 실무 맥락 모름",
+    "desc": "전공 일치 — 보유 역량과 채용 요구사항을 정밀 매칭해 지원 전략 정립하기",
     "flow": "공고 수집 → 용어 분석 → 역량 비교 → 지원 전략",
     "step0_warning": false
   },
   "C": {
     "title": "경력 전환자",
-    "desc": "유사 경험은 있지만 연결법 모름",
+    "desc": "경력 전환 — 기존 경험을 새 직무 언어로 번역하고 전이 가능 역량 강조하기",
     "flow": "공고 수집 → 역량 비교 → 적합성 평가 → 지원 전략",
     "step0_warning": false
   },
   "D": {
     "title": "직무 미정자",
-    "desc": "뭘 해야 할지 모르겠다",
+    "desc": "직무 미정 — 채용공고 분석으로 가능성 있는 직무 후보를 좁히고 방향 잡기",
     "flow": "STEP 0 (취업준비 진단) + 직무탐색 자료 먼저 완료 → 공고 수집 → 용어 분석",
     "step0_warning": true
   },
   "E": {
     "title": "다수 동시 지원자",
-    "desc": "10개+ 공고 동시 지원, 효율 필요",
+    "desc": "다수 동시 지원 — 공고별 차이를 빠르게 비교하고 효율적인 지원 전략 만들기",
     "flow": "공고 수집(핵심만) → 역량 비교 → 지원 전략",
     "step0_warning": false
   },
   "F": {
     "title": "스타트업/외국계",
-    "desc": "공고가 짧거나 영문. 공고 밖 조사가 핵심",
+    "desc": "스타트업·외국계 — 공고 외 회사 정보(IR, 블로그, 직원 후기 등) 종합 조사하기",
     "flow": "기업 심층 조사 → 공고 수집 → 용어 분석",
     "step0_warning": false
   },
   "G": {
     "title": "서류 합격, 면접 준비",
-    "desc": "직무 이해도를 면접관 언어로 표현",
+    "desc": "서류 합격 후 면접 준비 — 직무 이해도를 면접관 언어로 정리하기",
     "flow": "용어 분석 재검토 → 역량 비교 재점검 → 적합성 평가",
     "step0_warning": false
   },
   "H": {
     "title": "공공기관/공기업 (NCS)",
-    "desc": "NCS 기반 공고는 구조가 다름",
+    "desc": "NCS 기반 공고 분석 — NCS 직무기술서를 채용공고와 매칭해 핵심 역량 정리하기",
     "flow": "공고 수집 → 용어 분석 → 역량 비교(NCS 특화)",
     "step0_warning": false
   },
   "I": {
     "title": "포트폴리오 중심 직군",
-    "desc": "자소서보다 포트폴리오가 핵심",
+    "desc": "포트폴리오 중심 직군 — 채용공고 요구 역량을 포트폴리오 콘셉트로 연결하기",
     "flow": "공고 수집 → 역량 비교 → 포트폴리오 연결표",
     "step0_warning": false
   },
   "J": {
     "title": "저학년/비취준생",
-    "desc": "취업 준비 자체가 처음",
+    "desc": "취업 준비 시작 — 채용공고 읽는 법부터 익히고 직무에 대한 감 잡기",
     "flow": "STEP 0 (취업준비 진단) 먼저 완료 → 채용담당자 시각 이해 → 공고 수집",
     "step0_warning": true
   }
@@ -798,6 +798,16 @@ const DIAGNOSIS = [
         "v": "student_new",
         "l": "4학년/졸업생",
         "d": "취업 준비 중입니다"
+      },
+      {
+        "v": "master",
+        "l": "석사 졸업/예정",
+        "d": "연구 경험 기반 직무 지원"
+      },
+      {
+        "v": "phd",
+        "l": "박사 졸업/예정",
+        "d": "전문 연구·R&D 직무 지원"
       },
       {
         "v": "career",
@@ -936,12 +946,33 @@ const JobAnalysisWorkbook = () => {
 
   const determinePersona = (answers) => {
     const { status, job_decided, target_type } = answers;
-    if (status === 'student_low') return 'J';
-    if (status === 'interview') return 'G';
+    
+    // 1. 학생 초기·서류합격은 별도 흐름
+    if (status === 'student_low') return 'J';  // 저학년/비취준생
+    if (status === 'interview') return 'G';    // 서류 합격
+    
+    // 2. 석사·박사: 보통 연구 분야와 직무가 매칭 (직무 정해짐 + 깊이 있음)
+    //    포트폴리오/연구중심 직군이면 I, 회사 특성에 따라 분기
+    //    job_decided가 yes_major/yes_career_same이면 신입+경력 중간 페르소나로 B 또는 C
+    if (status === 'master' || status === 'phd') {
+      if (target_type === 'portfolio') return 'I';
+      if (target_type === 'public') return 'H';
+      if (target_type === 'startup') return 'F';
+      if (target_type === 'many') return 'E';
+      if (job_decided === 'no') return 'D';
+      if (job_decided === 'yes_different') return 'A';     // 전공과 다른 직무 전환
+      if (job_decided === 'yes_career_same') return 'C';   // 박사라면 같은 분야 이직(연구원→연구원 등)
+      if (job_decided === 'yes_major') return 'B';         // 전공 일치 (가장 흔함)
+      return 'B';
+    }
+    
+    // 3. 회사 특성이 직무 결정보다 우선 (대분류)
     if (target_type === 'public') return 'H';
     if (target_type === 'portfolio') return 'I';
     if (target_type === 'startup') return 'F';
     if (target_type === 'many') return 'E';
+    
+    // 4. 직무 결정 여부에 따라
     if (job_decided === 'no') return 'D';
     if (job_decided === 'yes_different') return 'A';
     if (job_decided === 'yes_career_same') return 'C';
@@ -1297,7 +1328,7 @@ const JobAnalysisWorkbook = () => {
     lines.push(`지원 직무: ${basicInfo.position || '-'}`);
     lines.push(`지원 회사/타겟: ${basicInfo.target || '-'}`);
     if (persona) {
-      lines.push(`진단 결과 페르소나: ${persona}. ${PERSONAS[persona].title}`);
+      lines.push(`분석 목표: ${persona}. ${PERSONAS[persona].title}`);
       lines.push(`추천 경로: ${PERSONAS[persona].flow}`);
     }
     lines.push('');
@@ -1517,14 +1548,15 @@ const JobAnalysisWorkbook = () => {
               const p = PERSONAS[pid];
               return (
                 <div style={{ ...S.boxInfo, marginTop: SPACING.lg }}>
-                  <p style={{ ...labelStyle(COLORS.blue), marginBottom: SPACING.sm }}>진단 결과</p>
+                  <p style={{ ...labelStyle(COLORS.blue), marginBottom: SPACING.sm }}>채용공고 및 직무분석 목표</p>
                   <p style={{ fontSize: FONT.size.lg, fontWeight: FONT.weight.bold, color: COLORS.accent, margin: 0, marginBottom: 4 }}>{pid}. {p.title}</p>
-                  <p style={{ fontSize: FONT.size.sm, color: COLORS.accent, margin: 0, marginBottom: 8 }}>{p.desc}</p>
+                  <p style={{ fontSize: FONT.size.sm, color: COLORS.accent, margin: 0, marginBottom: 8, lineHeight: FONT.lineHeight.relaxed }}>{p.desc}</p>
                   <p style={{ fontSize: FONT.size.sm, color: COLORS.blue, margin: 0, fontWeight: FONT.weight.semibold }}>추천 경로: {p.flow}</p>
+                  <p style={{ fontSize: FONT.size.xs, color: COLORS.sub, margin: '8px 0 0', lineHeight: FONT.lineHeight.relaxed, fontStyle: 'italic' }}>※ 위 안내는 입력하신 상황을 바탕으로 한 \"이 워크북의 활용 목표\"입니다. 실제 본인 상황(전공 지식, 실무 경험, 인턴십 등)이 더 깊다면 워크북을 더 빠르게 진행하셔도 좋습니다.</p>
                   {p.step0_warning && (
                     <div style={{ ...S.boxWarning, marginTop: SPACING.sm, marginBottom: 0 }}>
                       <p style={{ fontSize: FONT.size.sm, color: COLORS.accent, margin: 0, lineHeight: FONT.lineHeight.base }}>
-                        <strong>권장:</strong> 이 워크북은 직무가 정해진 후 사용하는 것이 효과적입니다. 방향이 확실하지 않다면 <strong><a href="https://www.latpeed.com/products/nDbq9" target="_blank" rel="noopener noreferrer" style={{ color: COLORS.accent, textDecoration: 'underline', fontWeight: FONT.weight.bold }}>[STEP0] CareerEngineer의 취업 로드맵 분석</a></strong>을 먼저 진행하세요. 그럼에도 지금 시작하신다면 공고 수집을 통해 감을 잡는 것도 가능합니다.
+                        <strong>권장:</strong> 이 워크북은 직무가 정해진 후 사용하는 것이 효과적입니다. 방향이 확실하지 않다면 <strong><a href="https://www.latpeed.com/products/YPFjD" target="_blank" rel="noopener noreferrer" style={{ color: COLORS.accent, textDecoration: 'underline', fontWeight: FONT.weight.bold }}>[STEP0] CareerEngineer의 취업 로드맵 분석</a></strong>을 먼저 진행하세요. 그럼에도 지금 시작하신다면 공고 수집을 통해 감을 잡는 것도 가능합니다.
                       </p>
                     </div>
                   )}
