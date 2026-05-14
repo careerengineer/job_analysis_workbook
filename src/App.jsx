@@ -1,5 +1,16 @@
 import React, { useState } from 'react';
 
+
+// __toDocxBlob: HTML을 실제 .docx Blob으로 변환 (모바일 Word 호환)
+// index.html 의 html-docx-js CDN 스크립트로 window.htmlDocx 가 제공됨
+const __toDocxBlob = (html) => {
+  if (typeof window !== 'undefined' && window.htmlDocx && window.htmlDocx.asBlob) {
+    try { return window.htmlDocx.asBlob(html); } catch (e) { console.error('htmlDocx failed:', e); }
+  }
+  return new Blob(['\ufeff' + html], { type: 'application/msword' });
+};
+
+
 // 멘토링·컨설팅 URL 상수 (작업 18: URL 상수화)
 const MENTORING_URLS = {
   consulting:        'https://www.latpeed.com/products/S92cP',  // 1-Hour 1:1 취업컨설팅
@@ -205,7 +216,7 @@ const IntroStickyHeader = ({ workbookKey, stepLabel, StepNavComponent }) => {
           style={{ padding: '8px 14px', borderRadius: 8, border: 'none', fontSize: 14, fontWeight: 600, fontFamily: 'inherit', background: _INTRO_INK, color: '#fff', opacity: 0.4, cursor: 'not-allowed' }}
           title="작성을 시작하면 활성화됩니다"
         >
-          저장(.doc)
+          저장(.docx)
         </button>
       </div>
     </div>
@@ -1394,11 +1405,11 @@ const JobAnalysisWorkbook = () => {
     const today = new Date().toISOString().slice(0,10);
     const text = buildTextDump();
     const h = `<!DOCTYPE html><html xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:w=\"urn:schemas-microsoft-com:office:word\" xmlns=\"http://www.w3.org/TR/REC-html40\"><head><meta charset="utf-8"><style>@page{size:A4;margin:1.5cm 1.8cm}body{font-family:'맑은 고딕',sans-serif;line-height:1.7;padding:40px;white-space:pre-wrap;mso-pre-wrap:yes}</style></head><body>${text}</body></html>`;
-    const b = new Blob([h], { type: 'application/msword;charset=utf-8' });
+    const b = __toDocxBlob(h);
     const u = URL.createObjectURL(b);
     const a = document.createElement('a');
     a.href = u;
-    a.download = `채용공고_직무분석_임시저장_${today}.doc`;
+    a.download = `채용공고_직무분석_임시저장_${today}.docx`;
     a.click();
     URL.revokeObjectURL(u);
     setDownloadSuccess(true);
@@ -1499,10 +1510,10 @@ ${checklistSection}
 </div></body></html>`;
     
     const BOM = '\uFEFF';
-    const b = new Blob([BOM + html], { type: 'application/msword' });
+    const b = __toDocxBlob(html);
     const u = URL.createObjectURL(b);
     const a = document.createElement('a'); a.href = u;
-    a.download = `채용공고_직무분석_${(basicInfo.position || '미입력').replace(/[^a-zA-Z0-9가-힣\s]/g, '_')}_${today}.doc`;
+    a.download = `채용공고_직무분석_${(basicInfo.position || '미입력').replace(/[^a-zA-Z0-9가-힣\s]/g, '_')}_${today}.docx`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(u), 1000);
     setDownloadSuccess(true);
@@ -1590,7 +1601,7 @@ ${checklistSection}
               <StepNavigatorDropdown open={showStepNav} onClose={() => setShowStepNav(false)} currentKey="job_analysis" />
             </div>
             <button disabled={!hasFormData()} onClick={savePartial} className="ce-save-btn" style={{...S.btnSaveHeader, opacity: hasFormData() ? 1 : 0.4, cursor: hasFormData() ? 'pointer' : 'not-allowed'}} title={hasFormData() ? "지금까지 작성한 내용을 Word로 저장" : "작성을 시작하면 활성화됩니다"}>
-              저장(.doc)
+              저장(.docx)
             </button>
           </div>
         </div>
@@ -1699,7 +1710,7 @@ ${checklistSection}
               <StepNavigatorDropdown open={showStepNav} onClose={() => setShowStepNav(false)} currentKey="job_analysis" />
             </div>
               <button onClick={savePartial} className="ce-save-btn" style={S.btnSaveHeader}>
-                저장(.doc)
+                저장(.docx)
               </button>
             </div>
           </div>
@@ -1804,7 +1815,7 @@ ${checklistSection}
               <StepNavigatorDropdown open={showStepNav} onClose={() => setShowStepNav(false)} currentKey="job_analysis" />
             </div>
               <button onClick={savePartial} className="ce-save-btn" style={S.btnSaveHeader}>
-                저장(.doc)
+                저장(.docx)
               </button>
             </div>
           </div>
@@ -1986,7 +1997,7 @@ ${checklistSection}
               <StepNavigatorDropdown open={showStepNav} onClose={() => setShowStepNav(false)} currentKey="job_analysis" />
             </div>
             <button disabled={!hasFormData()} onClick={savePartial} className="ce-save-btn" style={{...S.btnSaveHeader, opacity: hasFormData() ? 1 : 0.4, cursor: hasFormData() ? 'pointer' : 'not-allowed'}} title={hasFormData() ? "지금까지 작성한 내용을 Word로 저장" : "작성을 시작하면 활성화됩니다"}>
-              저장(.doc)
+              저장(.docx)
             </button>
           </div>
         </div>
@@ -2087,7 +2098,7 @@ ${checklistSection}
             </div>
 
             <button onClick={downloadFinal} style={{ ...S.btnPrimary, width: '100%', padding: '18px 32px', fontSize: FONT.size.lg, marginTop: SPACING.md }} className="ce-btn">
-              전체 분석 다운로드 (.doc)
+              전체 분석 다운로드 (.docx)
             </button>
             <button onClick={() => setPhase('formList')} style={{ ...S.btnSecondary, width: '100%', marginTop: SPACING.sm, justifyContent: 'center' }} className="ce-btn">
               이전
