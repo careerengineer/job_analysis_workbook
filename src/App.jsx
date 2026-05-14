@@ -1393,7 +1393,7 @@ const JobAnalysisWorkbook = () => {
   const savePartial = () => {
     const today = new Date().toISOString().slice(0,10);
     const text = buildTextDump();
-    const h = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:'맑은 고딕',sans-serif;line-height:1.7;padding:40px;white-space:pre-wrap}</style></head><body>${text}</body></html>`;
+    const h = `<!DOCTYPE html><html xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:w=\"urn:schemas-microsoft-com:office:word\" xmlns=\"http://www.w3.org/TR/REC-html40\"><head><meta charset="utf-8"><style>@page{size:A4;margin:1.5cm 1.8cm}body{font-family:'맑은 고딕',sans-serif;line-height:1.7;padding:40px;white-space:pre-wrap;mso-pre-wrap:yes}</style></head><body>${text}</body></html>`;
     const b = new Blob([h], { type: 'application/msword;charset=utf-8' });
     const u = URL.createObjectURL(b);
     const a = document.createElement('a');
@@ -1406,15 +1406,105 @@ const JobAnalysisWorkbook = () => {
   };
 
   const downloadFinal = () => {
-    const text = buildTextDump();
-    const h = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:'맑은 고딕',sans-serif;line-height:1.8;padding:40px;white-space:pre-wrap}</style></head><body>${text}</body></html>`;
-    const b = new Blob([h], { type: 'application/msword;charset=utf-8' });
+    const today = new Date().toISOString().slice(0,10);
+    const esc = (s) => (s || '').toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const br = (s) => esc(s).replace(/\n/g, '<br/>');
+    
+    // 섹션 헤더
+    const sh = (t) => `<p style="font-size:14pt;font-weight:bold;color:#0E2750;margin:24pt 0 10pt 0;padding-bottom:6pt;border-bottom:2pt solid #0E2750;">${esc(t)}</p>`;
+    
+    // 항목 표시 헬퍼 (빈 답변도 항목명 표시)
+    const item = (label, val, hint) => `
+      <div style="margin:10pt 0 10pt 0;">
+        <p style="font-size:11pt;font-weight:bold;color:#1B3A6B;margin:0 0 4pt 0;padding-left:10pt;border-left:3pt solid #C9A86A;">${esc(label)}</p>
+        ${hint ? `<p style="font-size:10pt;color:#6E7A8F;margin:0 0 4pt 13pt;font-style:italic;">${esc(hint)}</p>` : ''}
+        ${val && val.trim() 
+          ? `<p style="font-size:11pt;line-height:1.7;color:#0E2750;margin:0 0 0 13pt;">${br(val)}</p>` 
+          : `<p style="font-size:11pt;line-height:1.7;color:#6E7A8F;margin:0 0 0 13pt;font-style:italic;">[작성 전]</p>`}
+      </div>`;
+    
+    // 메타
+    const metaLine = (basicInfo.industry || basicInfo.position) 
+      ? `<p style="text-align:center;color:#1B3A6B;font-size:12pt;font-weight:bold;margin:0 0 24pt 0;">${esc(basicInfo.industry || '')}${basicInfo.industry && basicInfo.position ? ' · ' : ''}${basicInfo.position ? esc(basicInfo.position) : ''}${basicInfo.target ? ` · ${esc(basicInfo.target)}` : ''}</p>`
+      : '';
+    
+    // 페르소나 (분석 목표)
+    const personaSection = persona ? `${sh('분석 목표')}
+      <div style="padding:14pt 18pt;background:#F2F1EC;border-left:3pt solid #1B3A6B;margin:6pt 0 14pt 0;">
+        <p style="font-size:13pt;font-weight:bold;color:#0E2750;margin:0 0 6pt 0;">${esc(persona)}. ${esc(PERSONAS[persona].title)}</p>
+        <p style="font-size:11pt;color:#1B3A6B;line-height:1.7;margin:0 0 6pt 0;">${esc(PERSONAS[persona].desc)}</p>
+        <p style="font-size:11pt;color:#6E7A8F;margin:6pt 0 0 0;padding-top:6pt;border-top:1pt solid #E8E5DD;"><strong>추천 경로:</strong> ${esc(PERSONAS[persona].flow)}</p>
+      </div>` : '';
+    
+    // 통합 완성본
+    const finalSection = `${sh('통합 완성본')}
+      ${finalText && finalText.trim()
+        ? `<div style="padding:16pt 20pt;background:#F2F1EC;border-left:3pt solid #0E2750;margin:6pt 0 14pt 0;">${finalText.split('\n\n').filter(x => x.trim()).map(x => `<p style="font-size:11pt;line-height:1.9;color:#0E2750;margin:0 0 12pt 0;">${br(x)}</p>`).join('')}</div>`
+        : `<p style="font-size:11pt;line-height:1.9;color:#6E7A8F;margin:6pt 0 14pt 0;padding:14pt 18pt;background:#FBFAF6;border-left:3pt solid #C9A86A;font-style:italic;">[채용공고 분석 통합 완성본이 여기에 정리됩니다.]</p>`}`;
+    
+    // 채용공고 수집 표 (form_01)
+    const form1 = FORMS.find(f => f.id === 'form_01');
+    const validJobs = jobPostings.filter(j => form1.fields.some(f => (j[f.key] || '').trim()));
+    const jobsSection = validJobs.length > 0 ? `${sh(`${form1.title} — 수집 공고 ${validJobs.length}개`)}
+      ${validJobs.map((j, i) => `
+        <div style="margin:10pt 0 14pt 0;border:1pt solid #E8E5DD;padding:12pt 16pt;">
+          <p style="font-size:11pt;font-weight:bold;color:#0E2750;margin:0 0 8pt 0;border-bottom:1pt solid #E8E5DD;padding-bottom:6pt;">[공고 ${i+1}]</p>
+          <table border="0" cellspacing="0" cellpadding="0" width="100%">
+            ${form1.fields.filter(f => (j[f.key] || '').trim()).map(f => `<tr><td width="100" style="padding:5pt 0;color:#1B3A6B;font-weight:bold;font-size:10pt;vertical-align:top;">${esc(f.label)}</td><td style="padding:5pt 0;font-size:11pt;color:#0E2750;line-height:1.6;vertical-align:top;">${br(j[f.key])}</td></tr>`).join('')}
+          </table>
+        </div>`).join('')}` : `${sh(form1.title)}
+      <p style="font-size:11pt;color:#6E7A8F;margin:6pt 0 14pt 0;font-style:italic;">[수집된 채용공고가 여기에 정리됩니다.]</p>`;
+    
+    // 양식별 답변 (form_01 제외 — 빈 답변도 모두 표시)
+    const formsSections = FORMS.filter(f => f.id !== 'form_01').map(form => {
+      const formAns = formAnswers[form.id] || {};
+      const itemsHtml = form.fields.map(f => item(f.label, formAns[f.key], f.hint)).join('');
+      return `${sh(form.title)}${form.subtitle ? `<p style="font-size:11pt;color:#6E7A8F;margin:-4pt 0 14pt 0;font-style:italic;">${esc(form.subtitle)}</p>` : ''}${itemsHtml}`;
+    }).join('');
+    
+    // 완성 체크리스트
+    const checkedCount = COMPLETION_CHECKLIST.filter((_, i) => checklistState[i]).length;
+    const checklistRows = COMPLETION_CHECKLIST.map((it, i) => 
+      `<tr><td width="24" style="padding:8pt 0;border-bottom:1pt solid #E8E5DD;color:#C9A86A;font-weight:bold;font-size:13pt;text-align:center;vertical-align:top;">${checklistState[i] ? '✓' : '·'}</td><td style="padding:8pt 10pt;border-bottom:1pt solid #E8E5DD;color:#0E2750;font-size:11pt;line-height:1.6;vertical-align:top;">${esc(it)}</td></tr>`
+    ).join('');
+    const checklistSection = `${sh(`완성 기준 체크리스트 — ${checkedCount}/${COMPLETION_CHECKLIST.length}`)}
+      <table border="0" cellspacing="0" cellpadding="0" width="100%">${checklistRows}</table>`;
+    
+    const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="ProgId" content="Word.Document">
+<title>채용공고 및 직무 분석</title>
+<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom><w:DoNotPromptForConvert/></w:WordDocument></xml><![endif]-->
+<style>
+@page Section1 { size: A4; margin: 2.5cm 2cm; mso-page-orientation: portrait; }
+div.Section1 { page: Section1; }
+body { font-family: '맑은 고딕', 'Malgun Gothic', sans-serif; font-size: 11pt; color: #0E2750; line-height: 1.7; }
+p { margin: 0 0 8pt 0; }
+table { border-collapse: collapse; }
+</style>
+</head>
+<body lang="KO-KR">
+<div class="Section1">
+<p style="text-align:right;color:#6E7A8F;font-size:10pt;margin:0 0 4pt 0;">작성일 · ${today}</p>
+<p style="font-size:22pt;font-weight:bold;color:#0E2750;text-align:center;margin:0 0 6pt 0;padding-bottom:14pt;border-bottom:3pt solid #0E2750;letter-spacing:4pt;">채용공고 및 직무 분석</p>
+${metaLine}
+
+${personaSection}
+${finalSection}
+${jobsSection}
+${formsSections}
+${checklistSection}
+
+</div></body></html>`;
+    
+    const BOM = '\uFEFF';
+    const b = new Blob([BOM + html], { type: 'application/msword' });
     const u = URL.createObjectURL(b);
-    const a = document.createElement('a');
-    a.href = u;
-    a.download = `채용공고_직무분석_최종.doc`;
-    a.click();
-    URL.revokeObjectURL(u);
+    const a = document.createElement('a'); a.href = u;
+    a.download = `채용공고_직무분석_${(basicInfo.position || '미입력').replace(/[^a-zA-Z0-9가-힣\s]/g, '_')}_${today}.doc`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(u), 1000);
     setDownloadSuccess(true);
     setTimeout(() => setDownloadSuccess(false), 5000);
   };
