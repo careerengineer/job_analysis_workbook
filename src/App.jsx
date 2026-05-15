@@ -1,15 +1,4 @@
-import React, { useState } from 'react';
-
-
-// __toDocxBlob: HTML을 실제 .docx Blob으로 변환 (모바일 Word 호환)
-// index.html 의 html-docx-js CDN 스크립트로 window.htmlDocx 가 제공됨
-const __toDocxBlob = (html) => {
-  if (typeof window !== 'undefined' && window.htmlDocx && window.htmlDocx.asBlob) {
-    try { return window.htmlDocx.asBlob(html); } catch (e) { console.error('htmlDocx failed:', e); }
-  }
-  return new Blob(['\ufeff' + html], { type: 'application/msword' });
-};
-
+import React, { useState, useEffect } from 'react';
 
 // 멘토링·컨설팅 URL 상수 (작업 18: URL 상수화)
 const MENTORING_URLS = {
@@ -216,7 +205,7 @@ const IntroStickyHeader = ({ workbookKey, stepLabel, StepNavComponent }) => {
           style={{ padding: '8px 14px', borderRadius: 8, border: 'none', fontSize: 14, fontWeight: 600, fontFamily: 'inherit', background: _INTRO_INK, color: '#fff', opacity: 0.4, cursor: 'not-allowed' }}
           title="작성을 시작하면 활성화됩니다"
         >
-          저장(.docx)
+          저장(.doc)
         </button>
       </div>
     </div>
@@ -954,6 +943,71 @@ const JobAnalysisWorkbook = () => {
   const [checklistState, setChecklistState] = useState({});
   const [downloadSuccess, setDownloadSuccess] = useState(false);
   const [copyMsg, setCopyMsg] = useState('');
+  const [autoSaveStatus, setAutoSaveStatus] = useState('');
+  
+  const STORAGE_KEY = 'careerengineer_job_analysis_v1';
+  
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const data = JSON.parse(saved);
+        const hasAnswers = (data.formAnswers && Object.keys(data.formAnswers).length > 0) ||
+                           (data.jobPostings && data.jobPostings.some(j => Object.keys(j).filter(k => k !== 'id').length > 0)) ||
+                           data.persona;
+        if (hasAnswers) {
+          const savedDate = data.savedAt ? new Date(data.savedAt).toLocaleString('ko-KR') : '이전';
+          if (window.confirm(`이전에 작성한 내용이 있습니다 (${savedDate}).\n불러올까요?`)) {
+            if (data.basicInfo) setBasicInfo(data.basicInfo);
+            if (data.diagnosisAnswers) setDiagnosisAnswers(data.diagnosisAnswers);
+            if (data.persona) setPersona(data.persona);
+            if (data.jobPostings) setJobPostings(data.jobPostings);
+            if (data.formAnswers) setFormAnswers(data.formAnswers);
+            if (data.finalText) setFinalText(data.finalText);
+            if (data.checklistState) setChecklistState(data.checklistState);
+            if (data.phase) setPhase(data.phase);
+            setAutoSaveStatus('✓ 이전 작성 내용을 불러왔습니다');
+            setTimeout(() => setAutoSaveStatus(''), 5000);
+          } else {
+            localStorage.removeItem(STORAGE_KEY);
+          }
+        }
+      }
+    } catch (e) { console.warn(e); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  
+  useEffect(() => {
+    if (Object.keys(formAnswers).length === 0 && !persona) return;
+    const timer = setTimeout(() => {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          basicInfo, diagnosisAnswers, persona, jobPostings, formAnswers,
+          finalText, checklistState, phase,
+          savedAt: new Date().toISOString()
+        }));
+        setAutoSaveStatus('✓ 자동 저장됨');
+        setTimeout(() => setAutoSaveStatus(''), 2000);
+      } catch (e) { setAutoSaveStatus('⚠ 저장 공간 부족'); }
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [basicInfo, diagnosisAnswers, persona, jobPostings, formAnswers, finalText, checklistState, phase]);
+  
+  const clearSavedData = () => {
+    if (window.confirm('저장된 모든 작성 내용을 삭제하고 처음부터 다시 시작합니다.\n\n계속하시겠습니까?')) {
+      localStorage.removeItem(STORAGE_KEY);
+      setBasicInfo({ industry: '', position: '', target: '' });
+      setDiagnosisAnswers({});
+      setPersona(null);
+      setJobPostings([{ id: Date.now() }]);
+      setFormAnswers({});
+      setFinalText('');
+      setChecklistState({});
+      setPhase('intro');
+      setAutoSaveStatus('✓ 초기화 완료');
+      setTimeout(() => setAutoSaveStatus(''), 3000);
+    }
+  };
 
   const determinePersona = (answers) => {
     const { status, job_decided, target_type } = answers;
@@ -1402,122 +1456,215 @@ const JobAnalysisWorkbook = () => {
   };
 
   const savePartial = () => {
-    const today = new Date().toISOString().slice(0,10);
-    const text = buildTextDump();
-    const h = `<!DOCTYPE html><html xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:w=\"urn:schemas-microsoft-com:office:word\" xmlns=\"http://www.w3.org/TR/REC-html40\"><head><meta charset="utf-8"><style>@page{size:A4;margin:1.5cm 1.8cm}body{font-family:'맑은 고딕',sans-serif;line-height:1.7;padding:40px;white-space:pre-wrap;mso-pre-wrap:yes}</style></head><body>${text}</body></html>`;
-    const b = __toDocxBlob(h);
-    const u = URL.createObjectURL(b);
-    const a = document.createElement('a');
-    a.href = u;
-    a.download = `채용공고_직무분석_임시저장_${today}.docx`;
-    a.click();
-    URL.revokeObjectURL(u);
-    setDownloadSuccess(true);
-    setTimeout(() => setDownloadSuccess(false), 3000);
+    // 메인 다운로드와 동일한 디자인 사용 (모든 답변이 포함됨)
+    downloadFinal();
   };
 
-  const downloadFinal = () => {
-    const today = new Date().toISOString().slice(0,10);
-    const esc = (s) => (s || '').toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const br = (s) => esc(s).replace(/\n/g, '<br/>');
-    
-    // 섹션 헤더
-    const sh = (t) => `<p style="font-size:14pt;font-weight:bold;color:#0E2750;margin:24pt 0 10pt 0;padding-bottom:6pt;border-bottom:2pt solid #0E2750;">${esc(t)}</p>`;
-    
-    // 항목 표시 헬퍼 (빈 답변도 항목명 표시)
-    const item = (label, val, hint) => `
-      <div style="margin:10pt 0 10pt 0;">
-        <p style="font-size:11pt;font-weight:bold;color:#1B3A6B;margin:0 0 4pt 0;padding-left:10pt;border-left:3pt solid #C9A86A;">${esc(label)}</p>
-        ${hint ? `<p style="font-size:10pt;color:#6E7A8F;margin:0 0 4pt 13pt;font-style:italic;">${esc(hint)}</p>` : ''}
-        ${val && val.trim() 
-          ? `<p style="font-size:11pt;line-height:1.7;color:#0E2750;margin:0 0 0 13pt;">${br(val)}</p>` 
-          : `<p style="font-size:11pt;line-height:1.7;color:#6E7A8F;margin:0 0 0 13pt;font-style:italic;">[작성 전]</p>`}
-      </div>`;
-    
-    // 메타
-    const metaLine = (basicInfo.industry || basicInfo.position) 
-      ? `<p style="text-align:center;color:#1B3A6B;font-size:12pt;font-weight:bold;margin:0 0 24pt 0;">${esc(basicInfo.industry || '')}${basicInfo.industry && basicInfo.position ? ' · ' : ''}${basicInfo.position ? esc(basicInfo.position) : ''}${basicInfo.target ? ` · ${esc(basicInfo.target)}` : ''}</p>`
-      : '';
-    
-    // 페르소나 (분석 목표)
-    const personaSection = persona ? `${sh('분석 목표')}
-      <div style="padding:14pt 18pt;background:#F2F1EC;border-left:3pt solid #1B3A6B;margin:6pt 0 14pt 0;">
-        <p style="font-size:13pt;font-weight:bold;color:#0E2750;margin:0 0 6pt 0;">${esc(persona)}. ${esc(PERSONAS[persona].title)}</p>
-        <p style="font-size:11pt;color:#1B3A6B;line-height:1.7;margin:0 0 6pt 0;">${esc(PERSONAS[persona].desc)}</p>
-        <p style="font-size:11pt;color:#6E7A8F;margin:6pt 0 0 0;padding-top:6pt;border-top:1pt solid #E8E5DD;"><strong>추천 경로:</strong> ${esc(PERSONAS[persona].flow)}</p>
-      </div>` : '';
-    
-    // 통합 완성본
-    const finalSection = `${sh('통합 완성본')}
-      ${finalText && finalText.trim()
-        ? `<div style="padding:16pt 20pt;background:#F2F1EC;border-left:3pt solid #0E2750;margin:6pt 0 14pt 0;">${finalText.split('\n\n').filter(x => x.trim()).map(x => `<p style="font-size:11pt;line-height:1.9;color:#0E2750;margin:0 0 12pt 0;">${br(x)}</p>`).join('')}</div>`
-        : `<p style="font-size:11pt;line-height:1.9;color:#6E7A8F;margin:6pt 0 14pt 0;padding:14pt 18pt;background:#FBFAF6;border-left:3pt solid #C9A86A;font-style:italic;">[채용공고 분석 통합 완성본이 여기에 정리됩니다.]</p>`}`;
-    
-    // 채용공고 수집 표 (form_01)
-    const form1 = FORMS.find(f => f.id === 'form_01');
-    const validJobs = jobPostings.filter(j => form1.fields.some(f => (j[f.key] || '').trim()));
-    const jobsSection = validJobs.length > 0 ? `${sh(`${form1.title} — 수집 공고 ${validJobs.length}개`)}
-      ${validJobs.map((j, i) => `
-        <div style="margin:10pt 0 14pt 0;border:1pt solid #E8E5DD;padding:12pt 16pt;">
-          <p style="font-size:11pt;font-weight:bold;color:#0E2750;margin:0 0 8pt 0;border-bottom:1pt solid #E8E5DD;padding-bottom:6pt;">[공고 ${i+1}]</p>
-          <table border="0" cellspacing="0" cellpadding="0" width="100%">
-            ${form1.fields.filter(f => (j[f.key] || '').trim()).map(f => `<tr><td width="100" style="padding:5pt 0;color:#1B3A6B;font-weight:bold;font-size:10pt;vertical-align:top;">${esc(f.label)}</td><td style="padding:5pt 0;font-size:11pt;color:#0E2750;line-height:1.6;vertical-align:top;">${br(j[f.key])}</td></tr>`).join('')}
-          </table>
-        </div>`).join('')}` : `${sh(form1.title)}
-      <p style="font-size:11pt;color:#6E7A8F;margin:6pt 0 14pt 0;font-style:italic;">[수집된 채용공고가 여기에 정리됩니다.]</p>`;
-    
-    // 양식별 답변 (form_01 제외 — 빈 답변도 모두 표시)
-    const formsSections = FORMS.filter(f => f.id !== 'form_01').map(form => {
-      const formAns = formAnswers[form.id] || {};
-      const itemsHtml = form.fields.map(f => item(f.label, formAns[f.key], f.hint)).join('');
-      return `${sh(form.title)}${form.subtitle ? `<p style="font-size:11pt;color:#6E7A8F;margin:-4pt 0 14pt 0;font-style:italic;">${esc(form.subtitle)}</p>` : ''}${itemsHtml}`;
-    }).join('');
-    
-    // 완성 체크리스트
-    const checkedCount = COMPLETION_CHECKLIST.filter((_, i) => checklistState[i]).length;
-    const checklistRows = COMPLETION_CHECKLIST.map((it, i) => 
-      `<tr><td width="24" style="padding:8pt 0;border-bottom:1pt solid #E8E5DD;color:#C9A86A;font-weight:bold;font-size:13pt;text-align:center;vertical-align:top;">${checklistState[i] ? '✓' : '·'}</td><td style="padding:8pt 10pt;border-bottom:1pt solid #E8E5DD;color:#0E2750;font-size:11pt;line-height:1.6;vertical-align:top;">${esc(it)}</td></tr>`
-    ).join('');
-    const checklistSection = `${sh(`완성 기준 체크리스트 — ${checkedCount}/${COMPLETION_CHECKLIST.length}`)}
-      <table border="0" cellspacing="0" cellpadding="0" width="100%">${checklistRows}</table>`;
-    
-    const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta name="ProgId" content="Word.Document">
-<title>채용공고 및 직무 분석</title>
-<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom><w:DoNotPromptForConvert/></w:WordDocument></xml><![endif]-->
-<style>
-@page Section1 { size: A4; margin: 2.5cm 2cm; mso-page-orientation: portrait; }
-div.Section1 { page: Section1; }
-body { font-family: '맑은 고딕', 'Malgun Gothic', sans-serif; font-size: 11pt; color: #0E2750; line-height: 1.7; }
-p { margin: 0 0 8pt 0; }
-table { border-collapse: collapse; }
-</style>
-</head>
-<body lang="KO-KR">
-<div class="Section1">
-<p style="text-align:right;color:#6E7A8F;font-size:10pt;margin:0 0 4pt 0;">작성일 · ${today}</p>
-<p style="font-size:22pt;font-weight:bold;color:#0E2750;text-align:center;margin:0 0 6pt 0;padding-bottom:14pt;border-bottom:3pt solid #0E2750;letter-spacing:4pt;">채용공고 및 직무 분석</p>
-${metaLine}
+  // docx 라이브러리 동적 로드
+  const loadDocxLib = () => new Promise((resolve, reject) => {
+    if (window.docx) return resolve(window.docx);
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/docx@9.6.1/build/index.umd.min.js';
+    script.onload = () => window.docx ? resolve(window.docx) : reject(new Error('로드 실패'));
+    script.onerror = () => reject(new Error('다운로드 실패'));
+    document.head.appendChild(script);
+  });
 
-${personaSection}
-${finalSection}
-${jobsSection}
-${formsSections}
-${checklistSection}
-
-</div></body></html>`;
-    
-    const BOM = '\uFEFF';
-    const b = __toDocxBlob(html);
-    const u = URL.createObjectURL(b);
-    const a = document.createElement('a'); a.href = u;
-    a.download = `채용공고_직무분석_${(basicInfo.position || '미입력').replace(/[^a-zA-Z0-9가-힣\s]/g, '_')}_${today}.docx`;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(u), 1000);
-    setDownloadSuccess(true);
-    setTimeout(() => setDownloadSuccess(false), 5000);
+  const downloadFinal = async () => {
+    try {
+      const docxLib = await loadDocxLib();
+      const { Document, Paragraph, TextRun, AlignmentType, BorderStyle, Packer } = docxLib;
+      const today = new Date().toISOString().slice(0,10);
+      
+      const titleP = (t) => new Paragraph({
+        children: [new TextRun({ text: t, bold: true, size: 40, font: '맑은 고딕', color: '0E2750', characterSpacing: 100 })],
+        alignment: AlignmentType.CENTER,
+        spacing: { before: 200, after: 240 },
+        border: { bottom: { style: BorderStyle.SINGLE, size: 24, color: '0E2750', space: 6 } }
+      });
+      const subtitleP = (t) => new Paragraph({
+        children: [new TextRun({ text: t, bold: true, size: 24, font: '맑은 고딕', color: '1B3A6B' })],
+        alignment: AlignmentType.CENTER,
+        spacing: { before: 200, after: 480 }
+      });
+      const sectionH = (t) => new Paragraph({
+        children: [new TextRun({ text: t, bold: true, size: 28, font: '맑은 고딕', color: '0E2750' })],
+        spacing: { before: 480, after: 200 },
+        border: { bottom: { style: BorderStyle.SINGLE, size: 12, color: '0E2750', space: 4 } }
+      });
+      const labelP = (t) => new Paragraph({
+        children: [new TextRun({ text: t, bold: true, size: 22, font: '맑은 고딕', color: '1B3A6B' })],
+        spacing: { before: 200, after: 80 },
+        border: { left: { style: BorderStyle.SINGLE, size: 24, color: 'C9A86A', space: 8 } },
+        indent: { left: 200 }
+      });
+      const hintP = (t) => new Paragraph({
+        children: [new TextRun({ text: t, italic: true, size: 18, font: '맑은 고딕', color: '6E7A8F' })],
+        spacing: { before: 0, after: 80 },
+        indent: { left: 360 }
+      });
+      const labelBodyP = (t) => new Paragraph({
+        children: (t || '').split('\n').flatMap((line, i) => i === 0 ? [new TextRun({ text: line, size: 22, font: '맑은 고딕', color: '0E2750' })] : [new TextRun({ break: 1, text: line, size: 22, font: '맑은 고딕', color: '0E2750' })]),
+        spacing: { before: 0, after: 160, line: 360 },
+        indent: { left: 360 }
+      });
+      const placeholderP = (t) => new Paragraph({
+        children: [new TextRun({ text: t, italic: true, size: 22, font: '맑은 고딕', color: '6E7A8F' })],
+        spacing: { before: 0, after: 160, line: 360 },
+        indent: { left: 360 }
+      });
+      const highlightP = (t) => new Paragraph({
+        children: t.split('\n').flatMap((line, i) => i === 0 ? [new TextRun({ text: line, size: 22, font: '맑은 고딕', color: '0E2750' })] : [new TextRun({ break: 1, text: line, size: 22, font: '맑은 고딕', color: '0E2750' })]),
+        spacing: { before: 100, after: 200, line: 380 },
+        shading: { fill: 'F2F1EC' },
+        border: { left: { style: BorderStyle.SINGLE, size: 24, color: '0E2750', space: 8 } },
+        indent: { left: 240 }
+      });
+      const dateP = () => new Paragraph({
+        children: [new TextRun({ text: '작성일 · ' + today, size: 20, font: '맑은 고딕', color: '6E7A8F' })],
+        alignment: AlignmentType.RIGHT,
+        spacing: { after: 80 }
+      });
+      const checkP = (checked, item) => new Paragraph({
+        children: [
+          new TextRun({ text: (checked ? '✓  ' : '·  '), bold: true, size: 22, font: '맑은 고딕', color: 'C9A86A' }),
+          new TextRun({ text: item, size: 22, font: '맑은 고딕', color: '0E2750' })
+        ],
+        spacing: { before: 80, after: 80 },
+        border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: 'E8E5DD', space: 4 } }
+      });
+      
+      const children = [dateP(), titleP('채 용 공 고  및  직 무  분 석')];
+      
+      // 메타
+      if (basicInfo.industry || basicInfo.position || basicInfo.target) {
+        const parts = [];
+        if (basicInfo.industry) parts.push(basicInfo.industry);
+        if (basicInfo.position) parts.push(basicInfo.position);
+        if (basicInfo.target) parts.push(basicInfo.target);
+        children.push(subtitleP(parts.join(' · ')));
+      }
+      
+      // 분석 목표
+      if (persona && PERSONAS[persona]) {
+        children.push(sectionH('분석 목표'));
+        children.push(new Paragraph({
+          children: [new TextRun({ text: `${persona}. ${PERSONAS[persona].title}`, bold: true, size: 26, font: '맑은 고딕', color: '0E2750' })],
+          spacing: { before: 100, after: 100 },
+          shading: { fill: 'F2F1EC' },
+          border: { left: { style: BorderStyle.SINGLE, size: 24, color: '1B3A6B', space: 8 } },
+          indent: { left: 240 }
+        }));
+        children.push(new Paragraph({
+          children: [new TextRun({ text: PERSONAS[persona].desc, size: 22, font: '맑은 고딕', color: '1B3A6B' })],
+          spacing: { before: 0, after: 100, line: 360 },
+          indent: { left: 240 }
+        }));
+        children.push(new Paragraph({
+          children: [
+            new TextRun({ text: '추천 경로: ', bold: true, size: 20, font: '맑은 고딕', color: '6E7A8F' }),
+            new TextRun({ text: PERSONAS[persona].flow, size: 20, font: '맑은 고딕', color: '6E7A8F' })
+          ],
+          spacing: { before: 0, after: 200 },
+          indent: { left: 240 }
+        }));
+      }
+      
+      // 통합 완성본
+      children.push(sectionH('통합 완성본'));
+      if (finalText && finalText.trim()) {
+        finalText.split('\n\n').filter(x => x.trim()).forEach(para => {
+          children.push(highlightP(para));
+        });
+      } else {
+        children.push(new Paragraph({
+          children: [new TextRun({ text: '[채용공고 분석 통합 완성본이 여기에 정리됩니다.]', italic: true, size: 22, font: '맑은 고딕', color: '6E7A8F' })],
+          spacing: { before: 100, after: 200, line: 380 },
+          shading: { fill: 'FBFAF6' },
+          border: { left: { style: BorderStyle.SINGLE, size: 24, color: 'C9A86A', space: 8 } },
+          indent: { left: 240 }
+        }));
+      }
+      
+      // 채용공고 수집
+      const form1 = FORMS.find(f => f.id === 'form_01');
+      const validJobs = jobPostings.filter(j => form1.fields.some(f => (j[f.key] || '').trim()));
+      if (validJobs.length > 0) {
+        children.push(sectionH(`${form1.title} — 수집 공고 ${validJobs.length}개`));
+        validJobs.forEach((j, i) => {
+          children.push(new Paragraph({
+            children: [new TextRun({ text: `[공고 ${i+1}]`, bold: true, size: 22, font: '맑은 고딕', color: '0E2750' })],
+            spacing: { before: 200, after: 80 },
+            border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: '1B3A6B', space: 4 } }
+          }));
+          form1.fields.forEach(f => {
+            if ((j[f.key] || '').trim()) {
+              children.push(new Paragraph({
+                children: [
+                  new TextRun({ text: f.label + ': ', bold: true, size: 20, font: '맑은 고딕', color: '1B3A6B' }),
+                  new TextRun({ text: j[f.key], size: 20, font: '맑은 고딕', color: '0E2750' })
+                ],
+                spacing: { before: 60, after: 60 },
+                indent: { left: 240 }
+              }));
+            }
+          });
+        });
+      } else {
+        children.push(sectionH(form1.title));
+        children.push(placeholderP('[수집된 채용공고가 여기에 정리됩니다.]'));
+      }
+      
+      // 양식별 답변 (form_01 제외)
+      FORMS.filter(f => f.id !== 'form_01').forEach(form => {
+        const formAns = formAnswers[form.id] || {};
+        children.push(sectionH(form.title));
+        if (form.subtitle) {
+          children.push(new Paragraph({
+            children: [new TextRun({ text: form.subtitle, italic: true, size: 20, font: '맑은 고딕', color: '6E7A8F' })],
+            spacing: { before: 0, after: 200 }
+          }));
+        }
+        form.fields.forEach(f => {
+          children.push(labelP(f.label));
+          if (f.hint) children.push(hintP(f.hint));
+          if (formAns[f.key] && formAns[f.key].trim()) {
+            children.push(labelBodyP(formAns[f.key]));
+          } else {
+            children.push(placeholderP('[작성 전]'));
+          }
+        });
+      });
+      
+      // 완성 체크리스트
+      const checkedCount = COMPLETION_CHECKLIST.filter((_, i) => checklistState[i]).length;
+      children.push(sectionH(`완성 기준 체크리스트 — ${checkedCount}/${COMPLETION_CHECKLIST.length}`));
+      COMPLETION_CHECKLIST.forEach((it, i) => {
+        children.push(checkP(checklistState[i], it));
+      });
+      
+      const doc = new Document({
+        creator: '',
+        title: '채용공고 및 직무 분석',
+        sections: [{
+          properties: { page: { margin: { top: 1400, right: 1133, bottom: 1400, left: 1133 } } },
+          children: children
+        }]
+      });
+      
+      const blob = await Packer.toBlob(doc);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `채용공고_직무분석_${(basicInfo.position || '미입력').replace(/[^a-zA-Z0-9가-힣\s]/g, '_')}_${today}.docx`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setDownloadSuccess(true);
+      setTimeout(() => setDownloadSuccess(false), 5000);
+    } catch (err) {
+      console.error('docx 생성 실패:', err);
+      alert('워드 문서 생성에 실패했습니다.\n' + (err.message || ''));
+    }
   };
 
   const S = {
@@ -1601,7 +1748,7 @@ ${checklistSection}
               <StepNavigatorDropdown open={showStepNav} onClose={() => setShowStepNav(false)} currentKey="job_analysis" />
             </div>
             <button disabled={!hasFormData()} onClick={savePartial} className="ce-save-btn" style={{...S.btnSaveHeader, opacity: hasFormData() ? 1 : 0.4, cursor: hasFormData() ? 'pointer' : 'not-allowed'}} title={hasFormData() ? "지금까지 작성한 내용을 Word로 저장" : "작성을 시작하면 활성화됩니다"}>
-              저장(.docx)
+              저장(.doc)
             </button>
           </div>
         </div>
@@ -1710,8 +1857,16 @@ ${checklistSection}
               <StepNavigatorDropdown open={showStepNav} onClose={() => setShowStepNav(false)} currentKey="job_analysis" />
             </div>
               <button onClick={savePartial} className="ce-save-btn" style={S.btnSaveHeader}>
-                저장(.docx)
+                저장(.doc)
               </button>
+            <button onClick={clearSavedData} style={{ background: 'transparent', color: '#6E7A8F', border: '1px solid #6E7A8F44', borderRadius: 10, padding: '6px 12px', fontSize: 13, fontWeight: 500, cursor: 'pointer', marginLeft: 8, whiteSpace: 'nowrap' }} title="저장된 작성 내용을 모두 지우고 처음부터 다시 시작">
+              새로 시작
+            </button>
+            {autoSaveStatus && (
+              <span style={{ fontSize: 12, color: autoSaveStatus.startsWith('⚠') ? '#C9A86A' : '#1FA47A', whiteSpace: 'nowrap', fontWeight: 500, marginLeft: 8 }}>
+                {autoSaveStatus}
+              </span>
+            )}
             </div>
           </div>
 
@@ -1815,8 +1970,16 @@ ${checklistSection}
               <StepNavigatorDropdown open={showStepNav} onClose={() => setShowStepNav(false)} currentKey="job_analysis" />
             </div>
               <button onClick={savePartial} className="ce-save-btn" style={S.btnSaveHeader}>
-                저장(.docx)
+                저장(.doc)
               </button>
+            <button onClick={clearSavedData} style={{ background: 'transparent', color: '#6E7A8F', border: '1px solid #6E7A8F44', borderRadius: 10, padding: '6px 12px', fontSize: 13, fontWeight: 500, cursor: 'pointer', marginLeft: 8, whiteSpace: 'nowrap' }} title="저장된 작성 내용을 모두 지우고 처음부터 다시 시작">
+              새로 시작
+            </button>
+            {autoSaveStatus && (
+              <span style={{ fontSize: 12, color: autoSaveStatus.startsWith('⚠') ? '#C9A86A' : '#1FA47A', whiteSpace: 'nowrap', fontWeight: 500, marginLeft: 8 }}>
+                {autoSaveStatus}
+              </span>
+            )}
             </div>
           </div>
 
@@ -1997,7 +2160,7 @@ ${checklistSection}
               <StepNavigatorDropdown open={showStepNav} onClose={() => setShowStepNav(false)} currentKey="job_analysis" />
             </div>
             <button disabled={!hasFormData()} onClick={savePartial} className="ce-save-btn" style={{...S.btnSaveHeader, opacity: hasFormData() ? 1 : 0.4, cursor: hasFormData() ? 'pointer' : 'not-allowed'}} title={hasFormData() ? "지금까지 작성한 내용을 Word로 저장" : "작성을 시작하면 활성화됩니다"}>
-              저장(.docx)
+              저장(.doc)
             </button>
           </div>
         </div>
@@ -2098,7 +2261,7 @@ ${checklistSection}
             </div>
 
             <button onClick={downloadFinal} style={{ ...S.btnPrimary, width: '100%', padding: '18px 32px', fontSize: FONT.size.lg, marginTop: SPACING.md }} className="ce-btn">
-              전체 분석 다운로드 (.docx)
+              전체 분석 다운로드 (.doc)
             </button>
             <button onClick={() => setPhase('formList')} style={{ ...S.btnSecondary, width: '100%', marginTop: SPACING.sm, justifyContent: 'center' }} className="ce-btn">
               이전
