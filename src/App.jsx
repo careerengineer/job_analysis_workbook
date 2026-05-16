@@ -205,7 +205,7 @@ const IntroStickyHeader = ({ workbookKey, stepLabel, StepNavComponent }) => {
           style={{ padding: '8px 14px', borderRadius: 8, border: 'none', fontSize: 14, fontWeight: 600, fontFamily: 'inherit', background: _INTRO_INK, color: '#fff', opacity: 0.4, cursor: 'not-allowed' }}
           title="작성을 시작하면 활성화됩니다"
         >
-          저장(.doc)
+          저장 (.docx)
         </button>
       </div>
     </div>
@@ -1766,7 +1766,7 @@ const JobAnalysisWorkbook = () => {
               <StepNavigatorDropdown open={showStepNav} onClose={() => setShowStepNav(false)} currentKey="job_analysis" />
             </div>
             <button disabled={!hasFormData()} onClick={savePartial} className="ce-save-btn" style={{...S.btnSaveHeader, opacity: hasFormData() ? 1 : 0.4, cursor: hasFormData() ? 'pointer' : 'not-allowed'}} title={hasFormData() ? "지금까지 작성한 내용을 Word로 저장" : "작성을 시작하면 활성화됩니다"}>
-              저장(.doc)
+              저장 (.docx)
             </button>
           </div>
         </div>
@@ -1875,7 +1875,7 @@ const JobAnalysisWorkbook = () => {
               <StepNavigatorDropdown open={showStepNav} onClose={() => setShowStepNav(false)} currentKey="job_analysis" />
             </div>
               <button onClick={savePartial} className="ce-save-btn" style={S.btnSaveHeader}>
-                저장(.doc)
+                저장 (.docx)
               </button>
             <button onClick={clearSavedData} style={{ background: 'transparent', color: '#6E7A8F', border: '1px solid #6E7A8F44', borderRadius: 10, padding: '6px 12px', fontSize: 13, fontWeight: 500, cursor: 'pointer', marginLeft: 8, whiteSpace: 'nowrap' }} title="저장된 작성 내용을 모두 지우고 처음부터 다시 시작">
               새로 시작
@@ -1988,7 +1988,7 @@ const JobAnalysisWorkbook = () => {
               <StepNavigatorDropdown open={showStepNav} onClose={() => setShowStepNav(false)} currentKey="job_analysis" />
             </div>
               <button onClick={savePartial} className="ce-save-btn" style={S.btnSaveHeader}>
-                저장(.doc)
+                저장 (.docx)
               </button>
             <button onClick={clearSavedData} style={{ background: 'transparent', color: '#6E7A8F', border: '1px solid #6E7A8F44', borderRadius: 10, padding: '6px 12px', fontSize: 13, fontWeight: 500, cursor: 'pointer', marginLeft: 8, whiteSpace: 'nowrap' }} title="저장된 작성 내용을 모두 지우고 처음부터 다시 시작">
               새로 시작
@@ -2178,7 +2178,7 @@ const JobAnalysisWorkbook = () => {
               <StepNavigatorDropdown open={showStepNav} onClose={() => setShowStepNav(false)} currentKey="job_analysis" />
             </div>
             <button disabled={!hasFormData()} onClick={savePartial} className="ce-save-btn" style={{...S.btnSaveHeader, opacity: hasFormData() ? 1 : 0.4, cursor: hasFormData() ? 'pointer' : 'not-allowed'}} title={hasFormData() ? "지금까지 작성한 내용을 Word로 저장" : "작성을 시작하면 활성화됩니다"}>
-              저장(.doc)
+              저장 (.docx)
             </button>
           </div>
         </div>
