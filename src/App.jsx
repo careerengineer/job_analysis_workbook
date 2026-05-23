@@ -1,3 +1,6 @@
+// [BUILD v38 20260523] PART 6 connection_sentences placeholder에 페르소나별 예시 3가지(자소서·작품매핑·면접) 추가 — 작업 28
+// [BUILD v37 20260523] PART 3에 my_experience_pool 필드 추가 (STEP 2 경험 연결) + PART 6에 experience_translation·connection_sentences 필드 추가 (역량 연결 강화) — 작업 27
+// [BUILD v36 20260520 10:30] docx 저장에 CareerEngineer 자료 + 멘토링 안내 섹션 추가 (ExternalHyperlink + linkP)
 import React, { useState, useEffect } from 'react';
 
 // 멘토링·컨설팅 URL 상수 (작업 18: URL 상수화)
@@ -200,13 +203,6 @@ const IntroStickyHeader = ({ workbookKey, stepLabel, StepNavComponent }) => {
           </button>
           {StepNavComponent && <StepNavComponent open={showStepNav} onClose={() => setShowStepNav(false)} currentKey={workbookKey} />}
         </div>
-        <button
-          disabled
-          style={{ padding: '8px 14px', borderRadius: 8, border: 'none', fontSize: 14, fontWeight: 600, fontFamily: 'inherit', background: _INTRO_INK, color: '#fff', opacity: 0.4, cursor: 'not-allowed' }}
-          title="작성을 시작하면 활성화됩니다"
-        >
-          저장 (.docx)
-        </button>
       </div>
     </div>
   );
@@ -420,8 +416,8 @@ const FORMS = [
       "I",
       "J"
     ],
-    "desc": "공고의 필수·우대 요건을 나열하고, 각각에 대해 내가 가진 역량을 O/△/X로 판단합니다.",
-    "completion_criteria": "모든 필수 요건에 O/△/X 판단 완료",
+    "desc": "내 경험 Top 5를 먼저 풀(pool)로 정리한 뒤, 공고의 필수·우대 요건 각각에 대해 어느 경험이 뒷받침하는지 O/△/X로 매핑합니다. 이 단계가 자소서·면접의 '역량 연결'을 가능하게 합니다.",
+    "completion_criteria": "내 경험 Top 5 정리 + 모든 필수 요건에 O/△/X + 매칭 경험 번호 표기",
     "references": [
       {
         "formId": "form_01",
@@ -448,14 +444,23 @@ const FORMS = [
         "rows": 4
       },
       {
+        "key": "my_experience_pool",
+        "label": "내 경험 Top 5 (STEP 2 경험 정리 워크북에서 가져오기)",
+        "hint": "STEP 2 결과물에서 강도 높은 경험 5개를 복사. 각 경험은 한 줄(상황·행동·결과)로 요약",
+        "placeholder": "예) 1. 학과 학회 운영진 — 신입생 35명 멘토링 매칭 시스템 설계, 매칭 만족도 92%\n2. 캡스톤 프로젝트 — 4인 팀 PM, 6개월 일정 관리, 학과 최우수상\n3. ...",
+        "rows": 6
+      },
+      {
         "key": "my_match_must",
         "label": "필수 요건에 대한 내 역량 판단 (O/△/X + 증거)",
-        "hint": "O 충족: 실무 독립 사용 / △ 부분: 수업·강의 / X 미충족: 경험 없음",
+        "hint": "위 경험 풀에서 어떤 경험이 이 요건을 뒷받침하는지 번호로 연결. O 충족: 실무 독립 사용 / △ 부분: 수업·강의 / X 미충족: 경험 없음",
+        "placeholder": "예) 요건1 [SQL 활용] — O / 경험 3번 (마케팅 인턴 — 일일 매출 쿼리 자동화)",
         "rows": 5
       },
       {
         "key": "my_match_plus",
         "label": "우대 사항에 대한 내 역량 판단 (O/△/X + 증거)",
+        "hint": "마찬가지로 경험 풀의 번호로 연결",
         "rows": 4
       },
       {
@@ -612,12 +617,17 @@ const FORMS = [
       "J"
     ],
     "desc": "이력서·자소서에 반드시 들어갈 키워드와 배치 전략을 정리합니다. PART 3/4 워크북으로 넘기기 직전의 다리.",
-    "completion_criteria": "이력서 키워드 5개 + 역질문 3개 준비",
+    "completion_criteria": "연결 문장 3개 + 이력서 키워드 5개 + 역질문 3개 준비",
     "references": [
       {
         "formId": "form_02",
         "label": "직무 용어 분석",
         "showField": "keywords"
+      },
+      {
+        "formId": "form_03",
+        "label": "내 경험 Top 5",
+        "showField": "my_experience_pool"
       },
       {
         "formId": "form_03",
@@ -631,6 +641,20 @@ const FORMS = [
       }
     ],
     "fields": [
+      {
+        "key": "experience_translation",
+        "label": "내 경험을 직무 언어로 다시 쓰기 (경험 2~3개)",
+        "hint": "PART 2의 핵심 키워드 / 산업 용어를 사용해서 내 경험을 다시 표현. \"카페 알바\" → \"시간대별 주문 데이터 분석 기반 발주 최적화\"처럼.",
+        "placeholder": "예) 원래 표현: 학회 운영진으로 신입생 멘토링 매칭을 했다\n→ 직무 언어로: 35명 대상 매칭 알고리즘 설계, 만족도 92% 달성 (협업·프로세스 설계 역량)",
+        "rows": 6
+      },
+      {
+        "key": "connection_sentences",
+        "label": "연결 문장 3개 — 자소서·면접 첫 문장 그대로 사용",
+        "hint": "[공고 요건] ↔ [내 경험] ↔ [성과·숫자] 한 문장으로. 자소서 첫 문장이나 면접 \"왜 우리 회사인가요?\" 답변 도입부에 그대로 활용. 본인 직군에 맞는 형식을 골라서 작성.",
+        "placeholder": "▼ 자소서 도입 문장형 (전공/비전공 신입·경력 전환자)\n예) 본 직무가 요구하는 \"데이터 기반 마케팅 의사결정\"은, 제가 OO 인턴 6개월간 GA4·SQL로 캠페인 ROI를 분석해 광고비를 30% 절감한 경험과 직결됩니다.\n\n▼ 작품 매핑형 (포트폴리오 직군 — UX·개발·디자인·기획)\n예) [공고 요구: 유저 리서치 기반 디자인 의사결정]\n→ 졸업작품 「○○○ 앱 리디자인」: 사용자 인터뷰 12명 → 페르소나 3개 도출 → 메인 플로우 재설계 → 태스크 완료율 38% → 71%\n\n▼ 면접 첫 문장형 (서류 합격 후 면접 준비)\n예) Q. \"우리 회사에 왜 지원했나요?\"\nA. \"본 직무의 'A/B 테스트 기반 그로스' 역량은, 제가 사이드로 운영한 유튜브 채널에서 썸네일·인트로를 매주 테스트해 평균 조회수를 2.3배 늘린 경험과 직결됩니다. 그래서…\"\n\n──── 위 형식 참고해서 본인 연결 문장 3개 작성 ────\n1.\n2.\n3.",
+        "rows": 14
+      },
       {
         "key": "resume_keywords",
         "label": "이력서 필수 키워드 5개 + 배치 섹션",
@@ -929,6 +953,10 @@ const JobAnalysisWorkbook = () => {
   const [phase, setPhase] = useState('intro');
   const [showHelp, setShowHelp] = useState(true);
   const [showStepNav, setShowStepNav] = useState(false);
+  const goHome = () => {
+    setPhase('intro');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
   const [basicInfo, setBasicInfo] = useState({ industry: '', position: '', target: '' });
 
   const [diagnosisAnswers, setDiagnosisAnswers] = useState({});
@@ -944,6 +972,8 @@ const JobAnalysisWorkbook = () => {
   const [downloadSuccess, setDownloadSuccess] = useState(false);
   const [copyMsg, setCopyMsg] = useState('');
   const [autoSaveStatus, setAutoSaveStatus] = useState('');
+  const [confirmingClear, setConfirmingClear] = useState(false);
+  const [clearedFlash, setClearedFlash] = useState(false);
   
   const STORAGE_KEY = 'careerengineer_job_analysis_v1';
   
@@ -994,18 +1024,20 @@ const JobAnalysisWorkbook = () => {
   }, [basicInfo, diagnosisAnswers, persona, jobPostings, formAnswers, finalText, checklistState, phase]);
   
   const clearSavedData = () => {
-    if (window.confirm('저장된 모든 작성 내용을 삭제하고 처음부터 다시 시작합니다.\n\n계속하시겠습니까?')) {
+    if (confirmingClear) {
       localStorage.removeItem(STORAGE_KEY);
       setBasicInfo({ industry: '', position: '', target: '' });
-      setDiagnosisAnswers({});
       setPersona(null);
-      setJobPostings([{ id: Date.now() }]);
       setFormAnswers({});
       setFinalText('');
-      setChecklistState({});
-      setPhase('intro');
-      setAutoSaveStatus('✓ 초기화 완료');
-      setTimeout(() => setAutoSaveStatus(''), 3000);
+      setConfirmingClear(false);
+      setClearedFlash(true);
+      setTimeout(() => { localStorage.removeItem(STORAGE_KEY); }, 50);
+      setTimeout(() => { localStorage.removeItem(STORAGE_KEY); }, 1500);
+      setTimeout(() => setClearedFlash(false), 3000);
+    } else {
+      setConfirmingClear(true);
+      setTimeout(() => setConfirmingClear(false), 5000);
     }
   };
 
@@ -1125,7 +1157,7 @@ const JobAnalysisWorkbook = () => {
                   }}>
                     {!g.label && (
                       <span style={{
-                        position: 'absolute', left: SPACING.base, top: 14,
+                        position: 'absolute', left: SPACING.base, top: '50%', transform: 'translateY(-50%)',
                         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                         width: 64, height: 24, borderRadius: 4,
                         background: isCurrent ? COLORS.accent : COLORS.bgAlt,
@@ -1146,18 +1178,16 @@ const JobAnalysisWorkbook = () => {
                         <span style={{ fontSize: FONT.size.sm, fontWeight: FONT.weight.semibold, color: COLORS.accent }}>{g.label}</span>
                       </div>
                     )}
-                    <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'center', justifyContent: 'center', columnGap: 8, rowGap: 6 }}>
+                    <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: 8, alignItems: 'center', justifyContent: 'center', columnGap: 8, rowGap: 6, overflowX: 'auto' }}>
                       {g.items.map((it, ii) => {
                         const isCurrentItem = it.key === currentKey;
                         const link = it.directUrl ? { url: it.directUrl } : WORKBOOK_LINKS[it.key];
                         if (!link) return null;
                         const isMentoring = it.mentoring === true;
-                        const lineBreak = (isMentoring && ii > 0 && !g.items[ii - 1].mentoring);
                         const showSeparator = ii < g.items.length - 1 && (g.items[ii + 1].mentoring === isMentoring);
                         return (
                           <React.Fragment key={it.key || it.label}>
-                            {lineBreak && <span style={{ flexBasis: '100%', height: 0 }} />}
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap' }}>
                               {isCurrentItem ? (
                                 <span style={{ fontSize: FONT.size.sm, fontWeight: FONT.weight.bold, color: COLORS.accent }}>
                                   {it.label} <span style={{ fontSize: FONT.size.xs, color: COLORS.accent2, fontWeight: FONT.weight.semibold }}>(현재)</span>
@@ -1345,10 +1375,41 @@ const JobAnalysisWorkbook = () => {
   };
 
   const copyPrompt = (text) => {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopyMsg('✓ 프롬프트가 복사되었습니다. AI에 붙여넣어 사용하세요.');
+    // HTTPS 환경 — Clipboard API
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(() => {
+        setCopyMsg('✓ 프롬프트가 복사되었습니다. AI에 붙여넣어 사용하세요.');
+        setTimeout(() => setCopyMsg(''), 3000);
+      }).catch(() => fallbackCopy(text));
+    } else {
+      fallbackCopy(text);
+    }
+  };
+  
+  // HTTP / 구형 브라우저 fallback
+  const fallbackCopy = (text) => {
+    try {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      textarea.style.top = '0';
+      textarea.setAttribute('readonly', '');
+      document.body.appendChild(textarea);
+      textarea.select();
+      textarea.setSelectionRange(0, textarea.value.length);
+      const ok = document.execCommand('copy');
+      document.body.removeChild(textarea);
+      if (ok) {
+        setCopyMsg('✓ 프롬프트가 복사되었습니다. AI에 붙여넣어 사용하세요.');
+      } else {
+        setCopyMsg('⚠ 복사 실패 — 텍스트를 직접 선택해 복사해주세요.');
+      }
       setTimeout(() => setCopyMsg(''), 3000);
-    });
+    } catch (e) {
+      setCopyMsg('⚠ 복사 실패 — 텍스트를 직접 선택해 복사해주세요.');
+      setTimeout(() => setCopyMsg(''), 3000);
+    }
   };
 
   // 참고 박스용: 이전 양식의 전체 답변을 가져오기 (잘림 없이)
@@ -1464,846 +1525,4 @@ const JobAnalysisWorkbook = () => {
   const loadDocxLib = () => new Promise((resolve, reject) => {
     if (window.docx) return resolve(window.docx);
     const sources = [
-      'https://cdn.jsdelivr.net/npm/docx@9.6.1/build/index.umd.min.js',
-      'https://unpkg.com/docx@9.6.1/dist/index.iife.js',
-      'https://cdn.jsdelivr.net/npm/docx@9.6.1/dist/index.iife.js',
-      'https://unpkg.com/docx@9.6.1/build/index.umd.min.js',
-    ];
-    let idx = 0;
-    const tryNext = () => {
-      if (idx >= sources.length) {
-        reject(new Error('docx 라이브러리 다운로드 실패'));
-        return;
-      }
-      const script = document.createElement('script');
-      script.src = sources[idx++];
-      script.async = true;
-      script.onload = () => {
-        if (window.docx) resolve(window.docx);
-        else tryNext();
-      };
-      script.onerror = () => tryNext();
-      document.head.appendChild(script);
-    };
-    tryNext();
-  });
-
-  const downloadFinal = async () => {
-    try {
-      const docxLib = await loadDocxLib();
-      const { Document, Paragraph, TextRun, AlignmentType, BorderStyle, Packer } = docxLib;
-      const today = new Date().toISOString().slice(0,10);
-      
-      const titleP = (t) => new Paragraph({
-        children: [new TextRun({ text: t, bold: true, size: 40, font: '맑은 고딕', color: '0E2750', characterSpacing: 100 })],
-        alignment: AlignmentType.CENTER,
-        spacing: { before: 200, after: 240 },
-        border: { bottom: { style: BorderStyle.SINGLE, size: 24, color: '0E2750', space: 6 } }
-      });
-      const subtitleP = (t) => new Paragraph({
-        children: [new TextRun({ text: t, bold: true, size: 24, font: '맑은 고딕', color: '1B3A6B' })],
-        alignment: AlignmentType.CENTER,
-        spacing: { before: 200, after: 480 }
-      });
-      const sectionH = (t) => new Paragraph({
-        children: [new TextRun({ text: t, bold: true, size: 28, font: '맑은 고딕', color: '0E2750' })],
-        spacing: { before: 480, after: 200 },
-        border: { bottom: { style: BorderStyle.SINGLE, size: 12, color: '0E2750', space: 4 } }
-      });
-      const labelP = (t) => new Paragraph({
-        children: [new TextRun({ text: t, bold: true, size: 22, font: '맑은 고딕', color: '1B3A6B' })],
-        spacing: { before: 200, after: 80 },
-        border: { left: { style: BorderStyle.SINGLE, size: 24, color: 'C9A86A', space: 8 } },
-        indent: { left: 200 }
-      });
-      const hintP = (t) => new Paragraph({
-        children: [new TextRun({ text: t, italic: true, size: 18, font: '맑은 고딕', color: '6E7A8F' })],
-        spacing: { before: 0, after: 80 },
-        indent: { left: 360 }
-      });
-      const labelBodyP = (t) => new Paragraph({
-        children: (t || '').split('\n').flatMap((line, i) => i === 0 ? [new TextRun({ text: line, size: 22, font: '맑은 고딕', color: '0E2750' })] : [new TextRun({ break: 1, text: line, size: 22, font: '맑은 고딕', color: '0E2750' })]),
-        spacing: { before: 0, after: 160, line: 360 },
-        indent: { left: 360 }
-      });
-      const placeholderP = (t) => new Paragraph({
-        children: [new TextRun({ text: t, italic: true, size: 22, font: '맑은 고딕', color: '6E7A8F' })],
-        spacing: { before: 0, after: 160, line: 360 },
-        indent: { left: 360 }
-      });
-      const highlightP = (t) => new Paragraph({
-        children: t.split('\n').flatMap((line, i) => i === 0 ? [new TextRun({ text: line, size: 22, font: '맑은 고딕', color: '0E2750' })] : [new TextRun({ break: 1, text: line, size: 22, font: '맑은 고딕', color: '0E2750' })]),
-        spacing: { before: 100, after: 200, line: 380 },
-        shading: { fill: 'F2F1EC' },
-        border: { left: { style: BorderStyle.SINGLE, size: 24, color: '0E2750', space: 8 } },
-        indent: { left: 240 }
-      });
-      const dateP = () => new Paragraph({
-        children: [new TextRun({ text: '작성일 · ' + today, size: 20, font: '맑은 고딕', color: '6E7A8F' })],
-        alignment: AlignmentType.RIGHT,
-        spacing: { after: 80 }
-      });
-      const checkP = (checked, item) => new Paragraph({
-        children: [
-          new TextRun({ text: (checked ? '✓  ' : '·  '), bold: true, size: 22, font: '맑은 고딕', color: 'C9A86A' }),
-          new TextRun({ text: item, size: 22, font: '맑은 고딕', color: '0E2750' })
-        ],
-        spacing: { before: 80, after: 80 },
-        border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: 'E8E5DD', space: 4 } }
-      });
-      
-      const children = [dateP(), titleP('채 용 공 고  및  직 무  분 석')];
-      
-      // 메타
-      if (basicInfo.industry || basicInfo.position || basicInfo.target) {
-        const parts = [];
-        if (basicInfo.industry) parts.push(basicInfo.industry);
-        if (basicInfo.position) parts.push(basicInfo.position);
-        if (basicInfo.target) parts.push(basicInfo.target);
-        children.push(subtitleP(parts.join(' · ')));
-      }
-      
-      // 분석 목표
-      if (persona && PERSONAS[persona]) {
-        children.push(sectionH('분석 목표'));
-        children.push(new Paragraph({
-          children: [new TextRun({ text: `${persona}. ${PERSONAS[persona].title}`, bold: true, size: 26, font: '맑은 고딕', color: '0E2750' })],
-          spacing: { before: 100, after: 100 },
-          shading: { fill: 'F2F1EC' },
-          border: { left: { style: BorderStyle.SINGLE, size: 24, color: '1B3A6B', space: 8 } },
-          indent: { left: 240 }
-        }));
-        children.push(new Paragraph({
-          children: [new TextRun({ text: PERSONAS[persona].desc, size: 22, font: '맑은 고딕', color: '1B3A6B' })],
-          spacing: { before: 0, after: 100, line: 360 },
-          indent: { left: 240 }
-        }));
-        children.push(new Paragraph({
-          children: [
-            new TextRun({ text: '추천 경로: ', bold: true, size: 20, font: '맑은 고딕', color: '6E7A8F' }),
-            new TextRun({ text: PERSONAS[persona].flow, size: 20, font: '맑은 고딕', color: '6E7A8F' })
-          ],
-          spacing: { before: 0, after: 200 },
-          indent: { left: 240 }
-        }));
-      }
-      
-      // 통합 완성본
-      children.push(sectionH('통합 완성본'));
-      if (finalText && finalText.trim()) {
-        finalText.split('\n\n').filter(x => x.trim()).forEach(para => {
-          children.push(highlightP(para));
-        });
-      } else {
-        children.push(new Paragraph({
-          children: [new TextRun({ text: '[채용공고 분석 통합 완성본이 여기에 정리됩니다.]', italic: true, size: 22, font: '맑은 고딕', color: '6E7A8F' })],
-          spacing: { before: 100, after: 200, line: 380 },
-          shading: { fill: 'FBFAF6' },
-          border: { left: { style: BorderStyle.SINGLE, size: 24, color: 'C9A86A', space: 8 } },
-          indent: { left: 240 }
-        }));
-      }
-      
-      // 채용공고 수집
-      const form1 = FORMS.find(f => f.id === 'form_01');
-      const validJobs = jobPostings.filter(j => form1.fields.some(f => (j[f.key] || '').trim()));
-      if (validJobs.length > 0) {
-        children.push(sectionH(`${form1.title} — 수집 공고 ${validJobs.length}개`));
-        validJobs.forEach((j, i) => {
-          children.push(new Paragraph({
-            children: [new TextRun({ text: `[공고 ${i+1}]`, bold: true, size: 22, font: '맑은 고딕', color: '0E2750' })],
-            spacing: { before: 200, after: 80 },
-            border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: '1B3A6B', space: 4 } }
-          }));
-          form1.fields.forEach(f => {
-            if ((j[f.key] || '').trim()) {
-              children.push(new Paragraph({
-                children: [
-                  new TextRun({ text: f.label + ': ', bold: true, size: 20, font: '맑은 고딕', color: '1B3A6B' }),
-                  new TextRun({ text: j[f.key], size: 20, font: '맑은 고딕', color: '0E2750' })
-                ],
-                spacing: { before: 60, after: 60 },
-                indent: { left: 240 }
-              }));
-            }
-          });
-        });
-      } else {
-        children.push(sectionH(form1.title));
-        children.push(placeholderP('[수집된 채용공고가 여기에 정리됩니다.]'));
-      }
-      
-      // 양식별 답변 (form_01 제외)
-      FORMS.filter(f => f.id !== 'form_01').forEach(form => {
-        const formAns = formAnswers[form.id] || {};
-        children.push(sectionH(form.title));
-        if (form.subtitle) {
-          children.push(new Paragraph({
-            children: [new TextRun({ text: form.subtitle, italic: true, size: 20, font: '맑은 고딕', color: '6E7A8F' })],
-            spacing: { before: 0, after: 200 }
-          }));
-        }
-        form.fields.forEach(f => {
-          children.push(labelP(f.label));
-          if (f.hint) children.push(hintP(f.hint));
-          if (formAns[f.key] && formAns[f.key].trim()) {
-            children.push(labelBodyP(formAns[f.key]));
-          } else {
-            children.push(placeholderP('[작성 전]'));
-          }
-        });
-      });
-      
-      // 완성 체크리스트
-      const checkedCount = COMPLETION_CHECKLIST.filter((_, i) => checklistState[i]).length;
-      children.push(sectionH(`완성 기준 체크리스트 — ${checkedCount}/${COMPLETION_CHECKLIST.length}`));
-      COMPLETION_CHECKLIST.forEach((it, i) => {
-        children.push(checkP(checklistState[i], it));
-      });
-      
-      const doc = new Document({
-        creator: '',
-        title: '채용공고 및 직무 분석',
-        sections: [{
-          properties: { page: { margin: { top: 1400, right: 1133, bottom: 1400, left: 1133 } } },
-          children: children
-        }]
-      });
-      
-      const blob = await Packer.toBlob(doc);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `채용공고_직무분석_${(basicInfo.position || '미입력').replace(/[^a-zA-Z0-9가-힣\s]/g, '_')}_${today}.docx`;
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-      setDownloadSuccess(true);
-      setTimeout(() => setDownloadSuccess(false), 5000);
-    } catch (err) {
-      console.error('docx 생성 실패:', err);
-      alert('워드 문서 생성에 실패했습니다.\n' + (err.message || ''));
-    }
-  };
-
-  const S = {
-    page: { minHeight: '100vh', background: COLORS.bgAlt, padding: SPACING.md, fontFamily: FONT.family, color: COLORS.accent },
-    container: { maxWidth: 1350, margin: '0 auto' },
-    headerSticky: { background: COLORS.bgAlt, borderRadius: RADIUS.md, padding: SPACING.md, border: `1px solid ${COLORS.border}`, marginBottom: SPACING.md, position: 'sticky', top: SPACING.md, zIndex: 10, boxShadow: '0 2px 8px rgba(14, 39, 80, 0.12)' },
-    cardLarge: { background: COLORS.bg, borderRadius: RADIUS.md, padding: SPACING.xl, border: `1px solid ${COLORS.border}`, marginBottom: SPACING.md },
-    h1Center: { fontSize: FONT.size.h1, fontWeight: FONT.weight.bold, color: COLORS.accent, margin: `0 0 ${SPACING.md}px`, lineHeight: FONT.lineHeight.tight, textAlign: 'center' },
-    h2: { fontSize: FONT.size.h2, fontWeight: FONT.weight.bold, color: COLORS.accent, margin: 0, lineHeight: FONT.lineHeight.tight },
-    h3: { fontSize: FONT.size.lg, fontWeight: FONT.weight.semibold, color: COLORS.accent, margin: 0 },
-    brandEyebrow: { fontSize: FONT.size.xs, letterSpacing: 4, color: COLORS.sub, marginBottom: SPACING.base, textAlign: 'center', fontWeight: FONT.weight.medium },
-    subtitle: { fontSize: FONT.size.base, color: COLORS.sub, lineHeight: FONT.lineHeight.base, margin: 0 },
-    label: { fontSize: FONT.size.md, fontWeight: FONT.weight.semibold, color: COLORS.accent, display: 'block', marginBottom: SPACING.sm },
-    hint: { fontSize: FONT.size.sm, color: COLORS.sub, marginTop: 0, marginBottom: SPACING.sm, lineHeight: FONT.lineHeight.base, fontStyle: 'italic' },
-    textarea: { width: '100%', padding: '12px 16px', border: `1px solid ${COLORS.border}`, borderRadius: RADIUS.base, fontSize: FONT.size.base, fontFamily: FONT.family, color: COLORS.accent, outline: 'none', resize: 'none', boxSizing: 'border-box', lineHeight: 1.7, background: COLORS.bg, transition: 'border-color 150ms ease, box-shadow 150ms ease' },
-    input: { width: '100%', padding: '12px 16px', border: `1px solid ${COLORS.border}`, borderRadius: RADIUS.base, fontSize: FONT.size.base, fontFamily: FONT.family, color: COLORS.accent, outline: 'none', boxSizing: 'border-box', background: COLORS.bg, transition: 'border-color 150ms ease, box-shadow 150ms ease' },
-    btnPrimary: { background: COLORS.accent, color: COLORS.white, border: 'none', padding: '14px 20px', borderRadius: RADIUS.base, fontSize: FONT.size.md, fontWeight: FONT.weight.semibold, cursor: 'pointer', fontFamily: FONT.family, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 },
-    btnSecondary: { background: 'transparent', color: COLORS.accent, border: `1px solid ${COLORS.border}`, padding: '12px 24px', borderRadius: RADIUS.base, fontSize: FONT.size.base, fontWeight: FONT.weight.medium, cursor: 'pointer', fontFamily: FONT.family, display: 'inline-flex', alignItems: 'center', gap: 6 },
-    btnSaveHeader: { background: COLORS.accent2, color: COLORS.white, border: 'none', borderRadius: RADIUS.base, padding: '8px 14px', fontSize: FONT.size.sm, fontWeight: FONT.weight.semibold, cursor: 'pointer', fontFamily: FONT.family, display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap', transition: 'opacity 150ms ease' },
-    btnText: { background: 'transparent', color: COLORS.accent2, border: 'none', padding: 0, fontSize: FONT.size.sm, fontWeight: FONT.weight.medium, cursor: 'pointer', fontFamily: FONT.family, display: 'inline-flex', alignItems: 'center', gap: 4 },
-    boxTip:     { background: COLORS.yellowBg, border: `1px solid ${COLORS.yellow}33`, color: COLORS.accent, padding: SPACING.md, borderRadius: RADIUS.base, marginBottom: SPACING.md },
-    boxWarning: { background: COLORS.redBg,    border: `1px solid ${COLORS.red}33`,    color: COLORS.accent, padding: SPACING.md, borderRadius: RADIUS.base, marginBottom: SPACING.md },
-    boxSuccess: { background: COLORS.greenBg,  border: `1px solid ${COLORS.green}33`,  color: COLORS.accent, padding: SPACING.md, borderRadius: RADIUS.base, marginBottom: SPACING.md },
-    boxInfo:    { background: COLORS.blueBg,   border: `1px solid ${COLORS.blue}33`,   color: COLORS.accent, padding: SPACING.md, borderRadius: RADIUS.base, marginBottom: SPACING.md },
-    boxNeutral: { background: COLORS.bgAlt, border: `1px solid ${COLORS.border}`, color: COLORS.accent, padding: SPACING.md, borderRadius: RADIUS.base, marginBottom: SPACING.md },
-    copyrightWrap: { background: COLORS.bg, borderRadius: RADIUS.md, padding: SPACING.md, border: `1px solid ${COLORS.border}`, marginTop: SPACING.lg },
-    copyrightText: { fontSize: FONT.size.xs, color: COLORS.sub, textAlign: 'center', margin: 0, lineHeight: FONT.lineHeight.base },
-    copyrightWarn: { fontSize: FONT.size.xs, color: COLORS.red, textAlign: 'center', marginTop: 8, fontWeight: FONT.weight.medium, lineHeight: FONT.lineHeight.base },
-  };
-  const labelStyle = (color) => ({ fontSize: FONT.size.sm, fontWeight: FONT.weight.semibold, color, margin: 0, letterSpacing: 0.5, textTransform: 'uppercase' });
-
-  // ══════════════════ 인트로 ══════════════════
-      const renderIntro = () => (
-    <IntroPage
-      workbookKey='job_analysis'
-      StepNavComponent={StepNavigatorDropdown}
-      stepLabel='STEP 1 · 채용공고 및 직무 분석'
-      title='채용공고 및 직무 분석'
-      subtitle='채용공고에서 핵심 키워드를 추출하고 직무 적합성을 진단합니다'
-      flow={[
-          { label: '1단계', desc: '페르소나 진단 — 나의 상황 파악 (신입·경력·전환 등)' },
-          { label: '2단계', desc: '채용공고 양식 작성 — 회사·직무별 양식 만들기' },
-          { label: '3단계', desc: '양식 작성 — 직무상세내용 키워드 추출 및 적합성 검토' },
-          { label: '4단계', desc: '완료 — 분석 결과 최종 정리 및 다운로드' },
-        ]}
-      flowTitle={'이 워크북의 진행 단계'}
-      prerequisites={[
-          { text: '지원할 회사의 채용공고 (직무상세내용)' },
-          { text: '본인의 이력서 또는 경험 자료 (선택)' },
-        ]}
-      helpModal={<FirstVisitModal open={showHelp} onClose={() => setShowHelp(false)} title='채용공고 및 직무 분석 사용 안내' steps={[
-          '<strong>페르소나 진단</strong>으로 본인의 상황을 먼저 파악합니다.',
-          '<strong>분석 양식</strong>을 만든 뒤 채용공고를 붙여넣고 키워드를 추출합니다.',
-          '한 사람이 <strong>여러 회사·직무</strong>를 분석할 수 있으니 양식을 추가로 만드세요.',
-          '분석 결과는 자소서·이력서 작성 시 핵심 재료가 됩니다.',
-        ]} />}
-      onStart={() => { setPhase('diagnosis'); }}
-    />
-  );
-  // ══════════════════ 진단 ══════════════════
-  const renderDiagnosis = () => {
-    const allAnswered = DIAGNOSIS.every(q => diagnosisAnswers[q.id]);
-
-    return (
-      <div style={S.page}>
-        <FocusStyles />
-        <div style={S.container}>
-        <div style={S.headerSticky}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: SPACING.base, flexWrap: 'wrap' }}>
-            <CELockupA height={32} />
-            <div style={{ position: 'relative', flex: 1, display: 'flex', justifyContent: 'center' }}>
-              <button onClick={() => setShowStepNav(v => !v)} style={{ 
-                background: COLORS.bgAlt, border: 'none', cursor: 'pointer',
-                fontSize: FONT.size.sm, color: COLORS.accent, textAlign: 'center',
-                padding: '4px 12px', borderRadius: 4, fontFamily: FONT.family,
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-              }} title="전체 7단계 보기" className="ce-step-nav-trigger">
-                STEP 1 · 채용공고 및 직무 분석
-                <span style={{ fontSize: FONT.size.xs, color: COLORS.accent, opacity: 1, transform: showStepNav ? 'rotate(180deg)' : 'none', transition: 'transform 150ms' }}>▾</span>
-              </button>
-              <StepNavigatorDropdown open={showStepNav} onClose={() => setShowStepNav(false)} currentKey="job_analysis" />
-            </div>
-            <button disabled={!hasFormData()} onClick={savePartial} className="ce-save-btn" style={{...S.btnSaveHeader, opacity: hasFormData() ? 1 : 0.4, cursor: hasFormData() ? 'pointer' : 'not-allowed'}} title={hasFormData() ? "지금까지 작성한 내용을 Word로 저장" : "작성을 시작하면 활성화됩니다"}>
-              저장 (.docx)
-            </button>
-          </div>
-        </div>
-
-        
-          <div style={S.cardLarge}>
-            <div style={{ marginBottom: SPACING.lg }}>
-              <p style={S.brandEyebrow}>페르소나 진단</p>
-              <h1 style={S.h1Center}>나의 상황은 어디에?</h1>
-              <p style={{ ...S.subtitle, textAlign: 'center' }}>3개 질문에 답하면 10개 페르소나(A~J) 중 맞춤 경로를 추천합니다</p>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: SPACING.lg }}>
-              {DIAGNOSIS.map((q, qi) => (
-                <div key={q.id} style={{ background: COLORS.bgAlt, borderRadius: RADIUS.base, padding: SPACING.lg, borderLeft: `3px solid ${COLORS.accent2}` }}>
-                  <p style={{ ...S.label, fontSize: FONT.size.md }}>{qi+1}. {q.q}</p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: SPACING.sm }}>
-                    {q.options.map(opt => {
-                      const selected = diagnosisAnswers[q.id] === opt.v;
-                      return (
-                        <button
-                          key={opt.v}
-                          onClick={() => setDiagnosisAnswers(p => ({ ...p, [q.id]: opt.v }))}
-                          style={{
-                            textAlign: 'left', padding: SPACING.md,
-                            border: `1.5px solid ${selected ? COLORS.accent2 : COLORS.border}`,
-                            borderRadius: RADIUS.base,
-                            background: selected ? COLORS.blueBg : COLORS.bg,
-                            cursor: 'pointer', fontFamily: FONT.family,
-                          }}
-                          className="ce-card"
-                        >
-                          <p style={{ fontSize: FONT.size.sm, fontWeight: FONT.weight.semibold, color: COLORS.accent, margin: 0 }}>{opt.l}</p>
-                          <p style={{ fontSize: FONT.size.xs, color: COLORS.sub, margin: 0, marginTop: 4 }}>{opt.d}</p>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {allAnswered && (() => {
-              const pid = determinePersona(diagnosisAnswers);
-              const p = PERSONAS[pid];
-              return (
-                <div style={{ ...S.boxInfo, marginTop: SPACING.lg }}>
-                  <p style={{ ...labelStyle(COLORS.blue), marginBottom: SPACING.sm }}>채용공고 및 직무분석 목표</p>
-                  <p style={{ fontSize: FONT.size.lg, fontWeight: FONT.weight.bold, color: COLORS.accent, margin: 0, marginBottom: 4 }}>{pid}. {p.title}</p>
-                  <p style={{ fontSize: FONT.size.sm, color: COLORS.accent, margin: 0, marginBottom: 8, lineHeight: FONT.lineHeight.relaxed }}>{p.desc}</p>
-                  <p style={{ fontSize: FONT.size.sm, color: COLORS.blue, margin: 0, fontWeight: FONT.weight.semibold }}>추천 경로: {p.flow}</p>
-                  <p style={{ fontSize: FONT.size.xs, color: COLORS.sub, margin: '8px 0 0', lineHeight: FONT.lineHeight.relaxed, fontStyle: 'italic' }}>※ 위 안내는 입력하신 상황을 바탕으로 한 \"이 워크북의 활용 목표\"입니다. 실제 본인 상황(전공 지식, 실무 경험, 인턴십 등)이 더 깊다면 워크북을 더 빠르게 진행하셔도 좋습니다.</p>
-                  {p.step0_warning && (
-                    <div style={{ ...S.boxWarning, marginTop: SPACING.sm, marginBottom: 0 }}>
-                      <p style={{ fontSize: FONT.size.sm, color: COLORS.accent, margin: 0, lineHeight: FONT.lineHeight.base }}>
-                        <strong>권장:</strong> 이 워크북은 직무가 정해진 후 사용하는 것이 효과적입니다. 방향이 확실하지 않다면 <strong><a href="https://www.latpeed.com/products/YPFjD" target="_blank" rel="noopener noreferrer" style={{ color: COLORS.accent, textDecoration: 'underline', fontWeight: FONT.weight.bold }}>[STEP0] CareerEngineer의 취업 로드맵 분석</a></strong>을 먼저 진행하세요. 그럼에도 지금 시작하신다면 공고 수집을 통해 감을 잡는 것도 가능합니다.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
-
-            <div style={{ display: 'flex', gap: SPACING.base, marginTop: SPACING.lg }}>
-              <button onClick={() => setPhase('intro')} style={S.btnSecondary} className="ce-btn">
-                이전
-              </button>
-              <button
-                onClick={() => { setPersona(determinePersona(diagnosisAnswers)); setPhase('formList'); window.scrollTo(0,0); }}
-                disabled={!allAnswered}
-                style={{ ...S.btnPrimary, flex: 1, opacity: allAnswered ? 1 : 0.4, cursor: allAnswered ? 'pointer' : 'not-allowed' }}
-                className="ce-btn"
-              >
-                다음 </button>
-            </div>
-          </div>
-          <StickyFooter />
-        </div>
-      </div>
-    );
-  };
-
-  // ══════════════════ 양식 목록 ══════════════════
-  const renderFormList = () => {
-    const p = PERSONAS[persona];
-    const completedCount = FORMS.filter(f => getFormStatus(f) >= 3).length;
-
-    return (
-      <div style={S.page}>
-        <FocusStyles />
-        <div style={S.container}>
-
-          <div style={S.headerSticky}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: SPACING.base, marginBottom: SPACING.sm, flexWrap: 'wrap' }}>
-              <CELockupA height={32} />
-              <div style={{ position: 'relative', flex: 1, display: 'flex', justifyContent: 'center' }}>
-              <button onClick={() => setShowStepNav(v => !v)} style={{ 
-                background: COLORS.bgAlt, border: 'none', cursor: 'pointer',
-                fontSize: FONT.size.sm, color: COLORS.accent, textAlign: 'center',
-                padding: '4px 12px', borderRadius: 4, fontFamily: FONT.family,
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-              }} title="전체 7단계 보기" className="ce-step-nav-trigger">
-                STEP 1 · 채용공고 및 직무 분석
-                <span style={{ fontSize: FONT.size.xs, color: COLORS.accent, opacity: 1, transform: showStepNav ? 'rotate(180deg)' : 'none', transition: 'transform 150ms' }}>▾</span>
-              </button>
-              <StepNavigatorDropdown open={showStepNav} onClose={() => setShowStepNav(false)} currentKey="job_analysis" />
-            </div>
-              <button onClick={savePartial} className="ce-save-btn" style={S.btnSaveHeader}>
-                저장 (.docx)
-              </button>
-            <button onClick={clearSavedData} style={{ background: 'transparent', color: '#6E7A8F', border: '1px solid #6E7A8F44', borderRadius: 10, padding: '6px 12px', fontSize: 13, fontWeight: 500, cursor: 'pointer', marginLeft: 8, whiteSpace: 'nowrap' }} title="저장된 작성 내용을 모두 지우고 처음부터 다시 시작">
-              새로 시작
-            </button>
-            {autoSaveStatus && (
-              <span style={{ fontSize: 12, color: autoSaveStatus.startsWith('⚠') ? '#C9A86A' : '#1FA47A', whiteSpace: 'nowrap', fontWeight: 500, marginLeft: 8 }}>
-                {autoSaveStatus}
-              </span>
-            )}
-            </div>
-          </div>
-
-          {downloadSuccess && <div style={{ ...S.boxSuccess, marginBottom: SPACING.md, textAlign: 'center' }}><p style={{ fontSize: FONT.size.sm, color: COLORS.green, fontWeight: FONT.weight.semibold, margin: 0 }}>✓ 임시저장 완료</p></div>}
-
-          <div style={S.cardLarge}>
-            <div style={{ ...S.boxInfo, marginBottom: SPACING.lg }}>
-              <p style={{ ...labelStyle(COLORS.blue), marginBottom: SPACING.sm }}>나의 페르소나</p>
-              <p style={{ fontSize: FONT.size.lg, fontWeight: FONT.weight.bold, color: COLORS.accent, margin: 0, marginBottom: 4 }}>{persona}. {p.title}</p>
-              <p style={{ fontSize: FONT.size.sm, color: COLORS.accent, margin: 0, marginBottom: 8 }}>{p.desc}</p>
-              <p style={{ fontSize: FONT.size.sm, color: COLORS.blue, margin: 0, fontWeight: FONT.weight.semibold }}>추천 경로: {p.flow}</p>
-              <button onClick={() => setPhase('diagnosis')} style={{ ...S.btnText, marginTop: 8 }}>페르소나 다시 진단</button>
-            </div>
-
-            <div style={{ marginBottom: SPACING.lg }}>
-              <h2 style={{ ...S.h2, marginBottom: 4 }}>7개 양식</h2>
-              <p style={{ ...S.subtitle }}>완료 {completedCount}/7 · 원하는 양식을 클릭해 작성을 시작하세요</p>
-            </div>
-
-            <div style={S.boxTip}>
-              <p style={{ ...labelStyle(COLORS.yellow), marginBottom: SPACING.sm }}>TIP · 상태 뱃지 안내</p>
-              <p style={{ fontSize: FONT.size.sm, color: COLORS.accent, margin: 0, lineHeight: FONT.lineHeight.base }}>
-                <strong style={{ color: COLORS.blue }}>시작</strong> → <strong style={{ color: COLORS.yellow }}>작성 중</strong> → <strong style={{ color: COLORS.green }}>✓ 완료</strong>. [필수] 뱃지는 나의 페르소나 기준 권장 양식입니다.
-              </p>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: SPACING.sm, marginTop: SPACING.md }}>
-              {FORMS.map((f, i) => {
-                const level = getFormStatus(f);
-                const badge = statusBadge(level);
-                const isRequired = f.required_for.includes(persona);
-                const borderColor = level === 3 ? COLORS.green : level === 2 ? COLORS.yellow : level === 1 ? COLORS.blue : COLORS.border;
-                return (
-                  <button
-                    key={f.id}
-                    onClick={() => { setEditingFormId(f.id); setPhase('formEdit'); window.scrollTo(0,0); }}
-                    style={{
-                      width: '100%', textAlign: 'left', padding: SPACING.md,
-                      border: `1.5px solid ${borderColor}`, borderRadius: RADIUS.base,
-                      background: level > 0 ? `${borderColor}11` : COLORS.bg,
-                      cursor: 'pointer', fontFamily: FONT.family,
-                    }}
-                    className="ce-card"
-                  >
-                    <div style={{ display: 'flex', alignItems: 'start', gap: SPACING.sm, flexWrap: 'wrap' }}>
-                      <span style={{ minWidth: 40, padding: '4px 0', fontSize: FONT.size.sm, fontWeight: FONT.weight.bold, color: COLORS.accent2 }}>{String(i+1).padStart(2, '0')}</span>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, flexWrap: 'wrap' }}>
-                          <span style={{ fontSize: FONT.size.sm, fontWeight: FONT.weight.bold, color: COLORS.accent }}>{f.title}</span>
-                          {isRequired && <span style={{ fontSize: 16, padding: '2px 7px', borderRadius: 3, background: COLORS.redBg, color: COLORS.red, fontWeight: 700 }}>필수</span>}
-                          {f.type === 'repeat' && <span style={{ fontSize: 16, padding: '2px 7px', borderRadius: 3, background: COLORS.blueBg, color: COLORS.blue, fontWeight: 700 }}>반복 입력</span>}
-                          {f.prompt && <span style={{ fontSize: 16, padding: '2px 7px', borderRadius: 3, background: COLORS.blueBg, color: COLORS.blue, fontWeight: 700 }}>AI 프롬프트</span>}
-                        </div>
-                        <p style={{ fontSize: FONT.size.xs, color: COLORS.sub, margin: 0, lineHeight: FONT.lineHeight.base }}>{f.subtitle}</p>
-                        <p style={{ fontSize: FONT.size.xs, color: COLORS.sub, margin: `4px 0 0`, lineHeight: FONT.lineHeight.base }}>{f.desc}</p>
-                      </div>
-                      {badge && (
-                        <span style={{ fontSize: FONT.size.xs, padding: '4px 10px', borderRadius: 4, background: badge.bg, color: badge.color, fontWeight: FONT.weight.semibold, whiteSpace: 'nowrap' }}>
-                          {badge.text}
-                        </span>
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            <button onClick={() => { setPhase('completion'); window.scrollTo(0, 0); }} style={{ ...S.btnPrimary, width: '100%', padding: '16px 32px', marginTop: SPACING.lg }} className="ce-btn">
-              작성 완료하고 다운로드 </button>
-          </div>
-          <StickyFooter />
-        </div>
-      </div>
-    );
-  };
-
-  // ══════════════════ 양식 편집 ══════════════════
-  const renderFormEdit = () => {
-    const form = FORMS.find(f => f.id === editingFormId);
-    if (!form) return null;
-    const fIdx = FORMS.findIndex(f => f.id === editingFormId);
-
-    return (
-      <div style={S.page}>
-        <FocusStyles />
-        <div style={S.container}>
-
-          <div style={S.headerSticky}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: SPACING.base, marginBottom: SPACING.sm, flexWrap: 'wrap' }}>
-              <div style={{ fontSize: FONT.size.md, fontWeight: FONT.weight.bold, color: COLORS.accent }}>CareerEngineer</div>
-              <div style={{ position: 'relative', flex: 1, display: 'flex', justifyContent: 'center' }}>
-              <button onClick={() => setShowStepNav(v => !v)} style={{ 
-                background: COLORS.bgAlt, border: 'none', cursor: 'pointer',
-                fontSize: FONT.size.sm, color: COLORS.accent, textAlign: 'center',
-                padding: '4px 12px', borderRadius: 4, fontFamily: FONT.family,
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-              }} title="전체 7단계 보기" className="ce-step-nav-trigger">
-                STEP 1 · 채용공고 및 직무 분석
-                <span style={{ fontSize: FONT.size.xs, color: COLORS.accent, opacity: 1, transform: showStepNav ? 'rotate(180deg)' : 'none', transition: 'transform 150ms' }}>▾</span>
-              </button>
-              <StepNavigatorDropdown open={showStepNav} onClose={() => setShowStepNav(false)} currentKey="job_analysis" />
-            </div>
-              <button onClick={savePartial} className="ce-save-btn" style={S.btnSaveHeader}>
-                저장 (.docx)
-              </button>
-            <button onClick={clearSavedData} style={{ background: 'transparent', color: '#6E7A8F', border: '1px solid #6E7A8F44', borderRadius: 10, padding: '6px 12px', fontSize: 13, fontWeight: 500, cursor: 'pointer', marginLeft: 8, whiteSpace: 'nowrap' }} title="저장된 작성 내용을 모두 지우고 처음부터 다시 시작">
-              새로 시작
-            </button>
-            {autoSaveStatus && (
-              <span style={{ fontSize: 12, color: autoSaveStatus.startsWith('⚠') ? '#C9A86A' : '#1FA47A', whiteSpace: 'nowrap', fontWeight: 500, marginLeft: 8 }}>
-                {autoSaveStatus}
-              </span>
-            )}
-            </div>
-          </div>
-
-          {downloadSuccess && <div style={{ ...S.boxSuccess, marginBottom: SPACING.md, textAlign: 'center' }}><p style={{ fontSize: FONT.size.sm, color: COLORS.green, fontWeight: FONT.weight.semibold, margin: 0 }}>✓ 임시저장 완료</p></div>}
-          {copyMsg && <div style={{ ...S.boxSuccess, marginBottom: SPACING.md, textAlign: 'center' }}><p style={{ fontSize: FONT.size.sm, color: COLORS.green, fontWeight: FONT.weight.semibold, margin: 0 }}>{copyMsg}</p></div>}
-
-          <div style={S.cardLarge}>
-            <div style={{ marginBottom: SPACING.lg }}>
-              <p style={{ fontSize: FONT.size.xs, color: COLORS.accent2, fontWeight: FONT.weight.semibold, margin: 0, marginBottom: 6, letterSpacing: 0.3 }}>양식 {fIdx+1}/7</p>
-              <h2 style={S.h2}>{form.title}</h2>
-              <p style={{ ...S.subtitle, marginTop: 4 }}>{form.subtitle}</p>
-              <p style={{ fontSize: FONT.size.sm, color: COLORS.accent, margin: `${SPACING.sm}px 0 0`, lineHeight: FONT.lineHeight.base }}>{form.desc}</p>
-              {form.completion_criteria && (
-                <p style={{ fontSize: FONT.size.sm, color: COLORS.green, margin: `${SPACING.sm}px 0 0`, fontWeight: FONT.weight.semibold }}>✓ 완성 기준: {form.completion_criteria}</p>
-              )}
-            </div>
-
-            {/* 이전 양식 참고 박스 — 참조 양식의 전체 답변을 기본 노출 */}
-            {(() => {
-              const refFormIds = getReferencedFormIds(form);
-              if (refFormIds.length === 0) return null;
-
-              const refsWithContent = refFormIds
-                .map(fid => {
-                  const refForm = FORMS.find(f => f.id === fid);
-                  const content = getFullFormContent(fid);
-                  return { refForm, content };
-                })
-                .filter(x => x.content && x.refForm);
-
-              if (refsWithContent.length === 0) return null;
-
-              return (
-                <div style={{ ...S.boxInfo, marginBottom: SPACING.lg }}>
-                  <p style={{ ...labelStyle(COLORS.blue), marginBottom: SPACING.xs }}>참고 · 이전 양식에서 작성한 내용</p>
-                  <p style={{ fontSize: FONT.size.xs, color: COLORS.sub, margin: `0 0 ${SPACING.sm}px`, lineHeight: FONT.lineHeight.base }}>
-                    이 양식을 작성할 때 참고할 만한 이전 양식의 답변입니다. 스크롤하여 전체 내용을 확인하세요.
-                  </p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: SPACING.sm }}>
-                    {refsWithContent.map(({ refForm, content }, i) => (
-                      <div key={i} style={{ background: COLORS.bg, padding: SPACING.md, borderRadius: RADIUS.sm, borderLeft: `3px solid ${COLORS.blue}`, maxHeight: 280, overflow: 'auto' }}>
-                        <p style={{ fontSize: FONT.size.sm, fontWeight: FONT.weight.bold, color: COLORS.blue, margin: 0, marginBottom: SPACING.sm }}>
-                          {refForm.title} <span style={{ fontWeight: FONT.weight.regular, color: COLORS.sub, fontSize: FONT.size.xs }}>· {refForm.subtitle}</span>
-                        </p>
-                        <pre style={{ fontSize: FONT.size.sm, color: COLORS.accent, margin: 0, whiteSpace: 'pre-wrap', fontFamily: FONT.family, lineHeight: FONT.lineHeight.relaxed }}>{content}</pre>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })()}
-
-            {/* GenAI 프롬프트 */}
-            {form.prompt && (
-              <div style={{ ...S.boxInfo, marginBottom: SPACING.lg }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: SPACING.sm, marginBottom: SPACING.sm, flexWrap: 'wrap' }}>
-                  <p style={{ ...labelStyle(COLORS.blue), margin: 0 }}>{form.prompt.title}</p>
-                  <button onClick={() => copyPrompt(form.prompt.body)} style={{ background: COLORS.blue, color: COLORS.white, border: 'none', padding: '6px 12px', borderRadius: RADIUS.sm, fontSize: FONT.size.xs, fontWeight: FONT.weight.semibold, cursor: 'pointer', fontFamily: FONT.family, display: 'inline-flex', alignItems: 'center', gap: 4 }} className="ce-btn">
-                    프롬프트 복사
-                  </button>
-                </div>
-                <p style={{ fontSize: FONT.size.sm, color: COLORS.accent, margin: 0, lineHeight: FONT.lineHeight.base, fontStyle: 'italic' }}>
-                  "{form.prompt.body}"
-                </p>
-                <p style={{ fontSize: FONT.size.xs, color: COLORS.sub, margin: `${SPACING.sm}px 0 0`, lineHeight: FONT.lineHeight.base }}>
-                  [ ] 안의 내용만 나의 상황에 맞게 바꾼 뒤 ChatGPT·Claude 등에 붙여넣으세요. AI 답변은 반드시 출처 확인 후 활용.
-                </p>
-              </div>
-            )}
-
-            {/* 반복 입력 vs 구조화 */}
-            {form.type === 'repeat' ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: SPACING.md }}>
-                {jobPostings.map((job, idx) => (
-                  <div key={job.id} style={{ background: COLORS.bgAlt, borderRadius: RADIUS.base, padding: SPACING.md, borderLeft: `3px solid ${COLORS.accent2}` }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.sm }}>
-                      <p style={{ fontSize: FONT.size.md, fontWeight: FONT.weight.bold, color: COLORS.accent, margin: 0 }}>공고 {idx+1}</p>
-                      {jobPostings.length > 1 && (
-                        <button onClick={() => removeJobPosting(job.id)} style={{ ...S.btnText, color: COLORS.red }}>
-                          삭제
-                        </button>
-                      )}
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: SPACING.sm }}>
-                      {form.fields.map(f => (
-                        <div key={f.key}>
-                          <label style={{ ...S.label, fontSize: FONT.size.sm }}>{f.label}</label>
-                          {f.rows && f.rows > 1 ? (
-                            <textarea className="ce-textarea" value={job[f.key] || ''} onChange={e => updateJobPosting(job.id, f.key, e.target.value)} rows={f.rows} style={{ ...S.textarea, fontSize: FONT.size.sm }} placeholder={f.placeholder || ''} />
-                          ) : (
-                            <input type="text" className="ce-input" value={job[f.key] || ''} onChange={e => updateJobPosting(job.id, f.key, e.target.value)} style={{ ...S.input, fontSize: FONT.size.sm }} placeholder={f.placeholder || ''} />
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-                <button onClick={addJobPosting} style={{ ...S.btnSecondary, justifyContent: 'center', borderStyle: 'dashed' }} className="ce-btn">
-                  공고 추가
-                </button>
-                <div style={S.boxInfo}>
-                  <p style={{ fontSize: FONT.size.sm, color: COLORS.accent, margin: 0, lineHeight: FONT.lineHeight.base }}>
-                    <strong>Tip:</strong> 최소 10개 공고를 입력하면 반복되는 키워드 패턴이 보입니다. 이것이 이 직무의 핵심 역량입니다.
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: SPACING.md }}>
-                {form.fields.map(f => {
-                  const answers = formAnswers[form.id] || {};
-                  return (
-                    <div key={f.key} style={{ borderLeft: `3px solid ${COLORS.accent2}`, paddingLeft: SPACING.md }}>
-                      <label style={S.label}>{f.label}</label>
-                      {f.hint && <p style={S.hint}>{f.hint}</p>}
-                      <textarea className="ce-textarea" value={answers[f.key] || ''} onChange={e => setFormAnswer(form.id, f.key, e.target.value)} rows={f.rows || 3} style={S.textarea} placeholder={f.placeholder || ''} />
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* 네비 */}
-            <div style={{ display: 'flex', gap: SPACING.base, marginTop: SPACING.xl, flexWrap: 'wrap' }}>
-              <button onClick={() => { setPhase('formList'); window.scrollTo(0,0); }} style={S.btnSecondary} className="ce-btn">
-                양식 목록
-              </button>
-              <button
-                onClick={() => { if (fIdx > 0) { setEditingFormId(FORMS[fIdx-1].id); window.scrollTo(0,0); } }}
-                disabled={fIdx === 0}
-                style={{ ...S.btnSecondary, opacity: fIdx === 0 ? 0.4 : 1, cursor: fIdx === 0 ? 'not-allowed' : 'pointer' }}
-                className="ce-btn"
-              >
-                이전 양식
-              </button>
-              {fIdx < FORMS.length - 1 ? (
-                <button onClick={() => { setEditingFormId(FORMS[fIdx+1].id); window.scrollTo(0,0); }} style={{ ...S.btnPrimary, flex: 1 }} className="ce-btn">
-                  다음 </button>
-              ) : (
-                <button onClick={() => { setPhase('completion'); window.scrollTo(0,0); }} style={{ ...S.btnPrimary, flex: 1 }} className="ce-btn">
-                  작성 완료 </button>
-              )}
-            </div>
-          </div>
-
-          <div style={S.copyrightWrap}>
-            <p style={S.copyrightText}>© 2026 CareerEngineer. All Rights Reserved.</p>
-          </div>
-          <StickyFooter />
-        </div>
-      </div>
-    );
-  };
-
-  // ══════════════════ 완성 화면 (대폭 강화) ══════════════════
-  const renderCompletion = () => {
-    const completedCount = FORMS.filter(f => getFormStatus(f) >= 3).length;
-    const jobCount = jobPostings.filter(j => j.company || j.job_title).length;
-    const p = persona ? PERSONAS[persona] : null;
-    const checkedCount = COMPLETION_CHECKLIST.filter((_, i) => checklistState[i]).length;
-
-    return (
-      <div style={S.page}>
-        <FocusStyles />
-        <div style={S.container}>
-        <div style={S.headerSticky}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: SPACING.base, flexWrap: 'wrap' }}>
-            <CELockupA height={32} />
-            <div style={{ position: 'relative', flex: 1, display: 'flex', justifyContent: 'center' }}>
-              <button onClick={() => setShowStepNav(v => !v)} style={{ 
-                background: COLORS.bgAlt, border: 'none', cursor: 'pointer',
-                fontSize: FONT.size.sm, color: COLORS.accent, textAlign: 'center',
-                padding: '4px 12px', borderRadius: 4, fontFamily: FONT.family,
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-              }} title="전체 7단계 보기" className="ce-step-nav-trigger">
-                STEP 1 · 채용공고 및 직무 분석
-                <span style={{ fontSize: FONT.size.xs, color: COLORS.accent, opacity: 1, transform: showStepNav ? 'rotate(180deg)' : 'none', transition: 'transform 150ms' }}>▾</span>
-              </button>
-              <StepNavigatorDropdown open={showStepNav} onClose={() => setShowStepNav(false)} currentKey="job_analysis" />
-            </div>
-            <button disabled={!hasFormData()} onClick={savePartial} className="ce-save-btn" style={{...S.btnSaveHeader, opacity: hasFormData() ? 1 : 0.4, cursor: hasFormData() ? 'pointer' : 'not-allowed'}} title={hasFormData() ? "지금까지 작성한 내용을 Word로 저장" : "작성을 시작하면 활성화됩니다"}>
-              저장 (.docx)
-            </button>
-          </div>
-        </div>
-
-        
-          <div style={S.cardLarge}>
-            <div style={{ textAlign: 'center', marginBottom: SPACING.xl }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 64, height: 64, background: COLORS.greenBg, borderRadius: RADIUS.pill, marginBottom: SPACING.base }}>
-                </div>
-              <h1 style={S.h1Center}>작성 완료</h1>
-              <p style={{ ...S.subtitle, textAlign: 'center' }}>
-                수집 공고 {jobCount}개 · 양식 완료 {completedCount}/7
-              </p>
-              {p && <p style={{ ...S.subtitle, textAlign: 'center', marginTop: 4 }}>페르소나: <strong>{persona}. {p.title}</strong></p>}
-            </div>
-
-            {/* ── 완성 기준 체크리스트 (PART 6-4 필수) ── */}
-            <div style={{ ...S.boxSuccess, marginBottom: SPACING.lg }}>
-              <p style={{ ...labelStyle(COLORS.green), marginBottom: SPACING.sm }}>✓ 완성 기준 체크리스트 ({checkedCount}/{COMPLETION_CHECKLIST.length})</p>
-              <p style={{ fontSize: FONT.size.xs, color: COLORS.sub, margin: `0 0 ${SPACING.sm}px`, lineHeight: FONT.lineHeight.base }}>
-                아래 항목을 직접 확인하며 체크하세요. 채워지지 않은 항목이 있다면 해당 양식으로 돌아가 보완하시기 바랍니다.
-              </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {COMPLETION_CHECKLIST.map((item, i) => {
-                  const checked = !!checklistState[i];
-                  return (
-                    <label key={i} style={{ display: 'flex', alignItems: 'start', gap: 8, padding: 8, background: checked ? COLORS.bg : 'transparent', borderRadius: RADIUS.sm, cursor: 'pointer' }}>
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        onChange={e => setChecklistState(p => ({ ...p, [i]: e.target.checked }))}
-                        style={{ marginTop: 3, cursor: 'pointer', width: 16, height: 16, accentColor: COLORS.green }}
-                      />
-                      <span style={{ fontSize: FONT.size.sm, color: COLORS.accent, lineHeight: FONT.lineHeight.base, textDecoration: checked ? 'line-through' : 'none', opacity: checked ? 0.6 : 1 }}>
-                        {item}
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* ── 작성 내용 참고 (통합 완성본 위, 기본 노출) ── */}
-            <div style={{ ...S.boxNeutral, marginBottom: SPACING.lg }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: SPACING.sm, flexWrap: 'wrap', gap: SPACING.sm }}>
-                <h4 style={{ fontSize: FONT.size.md, fontWeight: FONT.weight.semibold, color: COLORS.accent, margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  지금까지 작성한 내용
-                </h4>
-                <p style={{ fontSize: FONT.size.xs, color: COLORS.sub, margin: 0 }}>아래 통합 완성본 작성 시 참고하세요</p>
-              </div>
-              <div style={{ background: COLORS.bg, borderRadius: RADIUS.sm, padding: SPACING.md, border: `1px solid ${COLORS.border}` }}>
-                <pre style={{ fontSize: FONT.size.sm, color: COLORS.accent, whiteSpace: 'pre-wrap', fontFamily: FONT.family, margin: 0, lineHeight: FONT.lineHeight.relaxed, maxHeight: 400, overflow: 'auto' }}>{buildTextDump()}</pre>
-              </div>
-            </div>
-
-            {/* ── 통합 완성본 textarea (기본 노출, 토글 제거) ── */}
-            <div style={{ background: COLORS.bgAlt, border: `1px solid ${COLORS.border}`, borderRadius: RADIUS.base, padding: SPACING.md, marginBottom: SPACING.lg }}>
-              <h3 style={{ ...S.h3, fontSize: FONT.size.md, display: 'flex', alignItems: 'center', gap: 6, marginBottom: SPACING.base }}>
-                통합 완성본 (선택)
-              </h3>
-              <p style={{ fontSize: FONT.size.xs, color: COLORS.sub, margin: `0 0 ${SPACING.sm}px`, lineHeight: FONT.lineHeight.base }}>
-                위의 작성 내용을 참고해 분석 결과를 한 문단으로 요약해보세요. 비워두고 바로 다운로드해도 됩니다.
-              </p>
-              <textarea
-                className="ce-textarea"
-                value={finalText}
-                onChange={e => setFinalText(e.target.value)}
-                rows={6}
-                style={{ ...S.textarea, fontSize: FONT.size.md }}
-                placeholder={`예시: 이 직무의 핵심 역량은 OO, OO, OO이다. 내가 가진 것은 OO, 부족한 것은 OO이다. 지원 전략은 OO이며, 자소서에서 강조할 앵글은 OO이다.`}
-              />
-              <p style={{ fontSize: FONT.size.xs, color: COLORS.sub, textAlign: 'right', margin: '4px 0 0', fontVariantNumeric: 'tabular-nums' }}>
-                {(finalText || '').length}자
-              </p>
-            </div>
-
-            <div style={S.boxInfo}>
-              <p style={{ ...labelStyle(COLORS.blue), marginBottom: SPACING.sm }}>INFO · 다음 STEP 안내</p>
-              <p style={{ fontSize: FONT.size.sm, color: COLORS.accent, margin: 0, lineHeight: FONT.lineHeight.base }}>
-                여기서 추출한 <strong>직무상세내용 핵심 키워드·요구 역량·회사 정보</strong>는 STEP 2 경험정리 · STEP 3 자소서 · STEP 5 면접 워크북 작성 시 반드시 참고하세요. 다운로드한 파일을 옆에 두고 작업하면 됩니다.
-              </p>
-            </div>
-
-            <RelatedWorkbookList
-              items={[
-              { id: 'experience', hint: '키워드와 매칭되는 경험 정리' },
-              { id: 'resume', hint: '이력서 — 직무상세내용 키워드를 핵심 성과에 반영' },
-              { id: 'motivation', hint: '지원동기 자소서 — 회사 분석을 동기로' },
-              { id: 'jobcompetency', hint: '직무역량 자소서 — 직무상세내용 키워드 활용' },
-              { id: 'interview_answer_guide', hint: '면접 유형별 답변 전략 — 직무 이해도 답변 톤' }
-            ]}
-          />
-            <div style={S.boxTip}>
-              <p style={{ ...labelStyle(COLORS.yellow), marginBottom: SPACING.sm }}>MENTORING · 멘토링 안내</p>
-              <p style={{ fontSize: FONT.size.sm, color: COLORS.accent, margin: 0, lineHeight: FONT.lineHeight.base }}>직무 분석 결과를 어떻게 자소서·면접으로 연결할지 막힌다면 CareerEngineer <a href={MENTORING_URLS.consulting} target="_blank" rel="noopener noreferrer" style={{ color: COLORS.accent2, fontWeight: FONT.weight.semibold, textDecoration: 'underline', transition: 'opacity 150ms ease'}}
-  onMouseEnter={e => e.currentTarget.style.opacity = 0.8}
-  onMouseLeave={e => e.currentTarget.style.opacity = 1}>1:1 멘토링</a>을 이용하세요.</p>
-            </div>
-
-            <button onClick={downloadFinal} style={{ ...S.btnPrimary, width: '100%', padding: '18px 32px', fontSize: FONT.size.lg, marginTop: SPACING.md }} className="ce-btn">
-              전체 분석 다운로드 (.doc)
-            </button>
-            <button onClick={() => setPhase('formList')} style={{ ...S.btnSecondary, width: '100%', marginTop: SPACING.sm, justifyContent: 'center' }} className="ce-btn">
-              이전
-            </button>
-
-            {downloadSuccess && <p style={{ fontSize: FONT.size.sm, color: COLORS.green, textAlign: 'center', marginTop: SPACING.md, fontWeight: FONT.weight.semibold }}>✓ 다운로드 완료</p>}
-
-            <div style={S.copyrightWrap}>
-              <p style={S.copyrightText}>© 2026 CareerEngineer. All Rights Reserved.</p>
-              <p style={S.copyrightWarn}>저작권법에 의하여 보호받는 저작물이므로 무단 전재와 무단 복제를 금합니다. 이 자료는 구매하신 분의 취업을 위한 개인 학습 용도로 자유롭게 활용하실 수 있으나, 자료의 전부 또는 일부를 다른 사람에게 공유하거나, 복제·재판매·재배포하는 것은 금지되어 있습니다. <strong>이를 위반할 경우 관련 법률에 따라 민·형사상 책임을 질 수 있습니다.</strong></p>
-            </div>
-          </div>
-          <StickyFooter />
-        </div>
-      </div>
-    );
-  };
-
-  if (phase === 'intro') return renderIntro();
-  if (phase === 'diagnosis') return renderDiagnosis();
-  if (phase === 'formList') return renderFormList();
-  if (phase === 'formEdit') return renderFormEdit();
-  if (phase === 'completion') return renderCompletion();
-  return null;
-};
-
-export default JobAnalysisWorkbook;
+      'https://cdn.jsdelivr.net
