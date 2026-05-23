@@ -1,7 +1,3 @@
-// [BUILD v40 20260523] PART 3 desc + my_experience_pool hint에 페르소나 D(직무 미정자)용 역추적 사용법 안내 추가 — 작업 30
-// [BUILD v39 20260523] 스티키 헤더 저장 버튼을 career_roadmap과 통일 (네이비 배경 + 생성 중·완료 상태 표시) + 모든 빈 placeholder 28개 페르소나별 예시로 채움 — 작업 29
-// [BUILD v38 20260523] PART 6 connection_sentences placeholder에 페르소나별 예시 3가지(자소서·작품매핑·면접) 추가 — 작업 28
-// [BUILD v37 20260523] PART 3에 my_experience_pool 필드 추가 (STEP 2 경험 연결) + PART 6에 experience_translation·connection_sentences 필드 추가 (역량 연결 강화) — 작업 27
 // [BUILD v36 20260520 10:30] docx 저장에 CareerEngineer 자료 + 멘토링 안내 섹션 추가 (ExternalHyperlink + linkP)
 import React, { useState, useEffect } from 'react';
 
@@ -376,28 +372,24 @@ const FORMS = [
         "key": "keywords",
         "label": "반복되는 핵심 키워드 3~5개",
         "hint": "공고를 읽으면서 여러 번 등장하는 용어",
-        "rows": 2,
-        "placeholder": "예) 품질관리(이공계): APQP, PPAP, FMEA, Cpk, 측정시스템분석\n예) 마케팅(비전공): 퍼포먼스, ROAS, CAC, LTV, 어트리뷰션\n예) UX(포폴): 디자인 시스템, 유저 플로우, 페르소나, A/B 테스트"
+        "rows": 2
       },
       {
         "key": "term_meaning",
         "label": "각 용어의 실무적 의미 (AI 조사 결과)",
         "hint": "용어 → 이 산업에서 실제로 어떻게 쓰이는지",
-        "rows": 5,
-        "placeholder": "예) APQP — 신차 양산 전 5단계 품질 계획 프로세스. 신차/신모델 개발 시 부품 협력사와 협업하며 단계별 게이트 통과 산출물을 만드는 활동\n예) ROAS — 광고비 대비 매출. 100만원 광고비로 300만원 매출 → ROAS 300%. 퍼포먼스 마케팅의 가장 기본 KPI"
+        "rows": 5
       },
       {
         "key": "work_flow",
         "label": "주요 업무의 시간 순서 + 협업 부서 + 산출물",
         "hint": "AI에게 재배열 요청한 결과 + 나의 이해",
-        "rows": 5,
-        "placeholder": "예) [매일] 전일 광고 데이터 점검(09:00) → 캠페인 입찰가 조정 → 디자이너에게 신규 소재 요청 → 일일 리포트 작성\n[주간] 채널별 성과 분석(월) → 다음주 예산 배분 회의(화)\n[월간] MMM 분석 → 다음달 캠페인 기획안 → 매체사 미팅\n협업 부서: 디자이너(소재), 데이터팀(어트리뷰션), 영업팀(리드 검증)\n산출물: 주간 리포트, 월간 MMM 분석서, 캠페인 기획안"
+        "rows": 5
       },
       {
         "key": "daily_vs_periodic",
         "label": "매일 하는 일 vs 분기별로 하는 일 구분",
-        "rows": 3,
-        "placeholder": "예) 매일: 광고 성과 모니터링, 입찰가 조정, 일일 리포트\n주간: 채널 성과 분석, 다음주 예산 배분\n월간: MMM 분석, 신규 캠페인 기획, 매체사 미팅\n분기: 예산 계획, 채널 믹스 재설정"
+        "rows": 3
       }
     ],
     "prompt": {
@@ -422,8 +414,8 @@ const FORMS = [
       "I",
       "J"
     ],
-    "desc": "내 경험 Top 5를 먼저 풀(pool)로 정리한 뒤, 공고의 필수·우대 요건 각각에 대해 어느 경험이 뒷받침하는지 O/△/X로 매핑합니다. 이 단계가 자소서·면접의 '역량 연결'을 가능하게 합니다. ※ 직무 미정자(페르소나 D)는 이 단계를 거꾸로 사용하세요 — 경험 풀을 먼저 채운 뒤 \"이 경험들이 어떤 직무와 어울리는지\"를 역추적하는 도구가 됩니다.",
-    "completion_criteria": "내 경험 Top 5 정리 + 모든 필수 요건에 O/△/X + 매칭 경험 번호 표기",
+    "desc": "공고의 필수·우대 요건을 나열하고, 각각에 대해 내가 가진 역량을 O/△/X로 판단합니다.",
+    "completion_criteria": "모든 필수 요건에 O/△/X 판단 완료",
     "references": [
       {
         "formId": "form_01",
@@ -441,43 +433,30 @@ const FORMS = [
         "key": "required_must",
         "label": "필수 자격요건 (공고 원문)",
         "hint": "\"필수\", \"요구\" 등으로 표시된 항목",
-        "rows": 4,
-        "placeholder": "예) 1. SQL 활용 가능자 (필수)\n2. GA4 또는 유사 분석툴 1년 이상 (필수)\n3. 마케팅 또는 데이터 관련 인턴/프로젝트 경험 (필수)\n4. 영어 커뮤니케이션 가능 (필수)"
+        "rows": 4
       },
       {
         "key": "required_plus",
         "label": "우대 사항 (공고 원문)",
         "hint": "\"우대\", \"환영\" 등으로 표시된 항목",
-        "rows": 4,
-        "placeholder": "예) 1. 퍼포먼스 마케팅 실무 경험 (우대)\n2. Python 데이터 분석 경험 (우대)\n3. B2B SaaS 산업 이해 (우대)\n4. 어트리뷰션 툴(Adjust, Appsflyer) 경험 (우대)"
-      },
-      {
-        "key": "my_experience_pool",
-        "label": "내 경험 Top 5 (STEP 2 경험 정리 워크북에서 가져오기)",
-        "hint": "STEP 2 결과물에서 강도 높은 경험 5개를 복사. 각 경험은 한 줄(상황·행동·결과)로 요약. ※ 직무 미정자라면 이 칸을 먼저 채우고, 채워진 경험들로 어울리는 직무를 역추적해도 됩니다.",
-        "placeholder": "예) 1. 학과 학회 운영진 — 신입생 35명 멘토링 매칭 시스템 설계, 매칭 만족도 92%\n2. 캡스톤 프로젝트 — 4인 팀 PM, 6개월 일정 관리, 학과 최우수상\n3. ...",
-        "rows": 6
+        "rows": 4
       },
       {
         "key": "my_match_must",
         "label": "필수 요건에 대한 내 역량 판단 (O/△/X + 증거)",
-        "hint": "위 경험 풀에서 어떤 경험이 이 요건을 뒷받침하는지 번호로 연결. O 충족: 실무 독립 사용 / △ 부분: 수업·강의 / X 미충족: 경험 없음",
-        "placeholder": "예) 요건1 [SQL 활용] — O / 경험 3번 (마케팅 인턴 — 일일 매출 쿼리 자동화)",
+        "hint": "O 충족: 실무 독립 사용 / △ 부분: 수업·강의 / X 미충족: 경험 없음",
         "rows": 5
       },
       {
         "key": "my_match_plus",
         "label": "우대 사항에 대한 내 역량 판단 (O/△/X + 증거)",
-        "hint": "마찬가지로 경험 풀의 번호로 연결",
-        "rows": 4,
-        "placeholder": "예) 우대1 [퍼포먼스 실무] — △ / 경험 2번 (사이드 유튜브 운영으로 A/B 테스트 경험은 있으나 광고비 집행 경험은 X)\n우대2 [Python] — O / 경험 3번 (캡스톤에서 데이터 전처리에 Python 사용)\n우대3 [B2B SaaS] — X / 해당 경험 없음, 이직 후 학습 필요"
+        "rows": 4
       },
       {
         "key": "gap_plan",
         "label": "부족한 역량의 2주 학습 계획",
         "hint": "구체적 강의·플랫폼·일일 시간",
-        "rows": 4,
-        "placeholder": "예) [부족 1: SQL 고급] → 인프런 \"SQL 입문~중급\" 강의 (14시간)\n주 1: 1~5강, 매일 1시간 × 5일 + 주말 실습 3시간\n주 2: 6~10강 + Hackerrank SQL 문제 30개 풀이\n검증: GitHub에 학습 노트 저장 + 면접에서 시연 가능 수준"
+        "rows": 4
       }
     ],
     "prompt": {
@@ -513,41 +492,35 @@ const FORMS = [
       {
         "key": "vision",
         "label": "기업 비전·미션",
-        "rows": 2,
-        "placeholder": "예) \"모빌리티 솔루션 기업으로의 전환\" — 자동차 제조에서 SDV(Software Defined Vehicle) 중심으로 전환 중. 2030년까지 전기차 비중 50% 목표"
+        "rows": 2
       },
       {
         "key": "recent_investment",
         "label": "최근 1년간 가장 크게 투자한 사업 영역",
         "hint": "이것이 지원 직무에 미치는 영향까지",
-        "rows": 3,
-        "placeholder": "예) 2025년 미국 조지아주 메타플랜트 가동 시작 (전기차·배터리 통합 생산 50만대 규모, 95억 달러 투자). 지원 직무인 품질관리는 미국 현지법인 인력 충원 중이며, 한국에서 파견 또는 현지 채용으로 진행. 이 흐름이 지원 직무에 미치는 영향: 신차 양산 초기 품질 안정화 인력 수요가 가장 큰 시기"
+        "rows": 3
       },
       {
         "key": "value_chain",
         "label": "밸류체인 상 위치",
         "hint": "원자재 → 공급사 → 이 회사 → 고객사 → 최종소비자",
-        "rows": 3,
-        "placeholder": "예) [원자재] 철강(포스코), 배터리 소재(에코프로비엠)\n→ [공급사] 모비스(부품), LG에너지솔루션(배터리)\n→ [이 회사] 완성차 조립·품질 관리\n→ [고객사] 글로벌 딜러망, 렌트카·리스사\n→ [최종소비자] B2C 운전자"
+        "rows": 3
       },
       {
         "key": "competitors",
         "label": "주요 경쟁사 2~3개 + 경쟁 포인트",
-        "rows": 3,
-        "placeholder": "예) 1. 토요타 — 하이브리드 강점, 품질 신뢰도 1위\n2. 폭스바겐 — 유럽 시장 점유, 전기차 ID 시리즈\n3. 테슬라 — 소프트웨어 우위, SDV의 표준\n경쟁 포인트: 가격(현대) vs 신뢰도(토요타) vs SW(테슬라)"
+        "rows": 3
       },
       {
         "key": "recent_news",
         "label": "최근 3개월 주요 뉴스 (검증된 것만)",
-        "rows": 3,
-        "placeholder": "예) 2026.04 — 미국 IRA 보조금 재조정으로 EV 6 가격 경쟁력 회복 (출처: 한국경제 4/15)\n2026.03 — 인도 푸네 공장 증설 발표, 인도 시장 점유율 2위 진입 (출처: 회사 IR)\n2026.02 — CES에서 자율주행 레벨3 차량 공개 (출처: CES 공식 보도자료)"
+        "rows": 3
       },
       {
         "key": "culture",
         "label": "기업 문화 (현직자 콘텐츠 기반)",
         "hint": "유튜브·블로그·커피챗으로 수집한 것",
-        "rows": 2,
-        "placeholder": "예) \"성과보다 과정 중심\" 문화로 알려짐 (유튜브 \"회사라이프\" 현직자 인터뷰 3건 기준). 야근은 부서 차이가 크고 품질팀은 양산 초기에 집중 (자동차 산업 특성). 신입 OJT 6개월 체계 잘 갖춰져 있음 (블라인드 후기 평균)"
+        "rows": 2
       }
     ],
     "prompt": {
@@ -589,32 +562,27 @@ const FORMS = [
       {
         "key": "energy_check",
         "label": "핵심 업무 3개 중 에너지가 빠지는 것 / 올라가는 것",
-        "rows": 3,
-        "placeholder": "예) [에너지 빠짐] 같은 검사를 매일 반복하는 일상 업무\n[에너지 올라감] 신규 부품 양산 초기 문제 발견·해결, 협력사와 기술 협의\n→ 결론: 양산 안정화 단계가 더 적성에 맞을 듯"
+        "rows": 3
       },
       {
         "key": "mismatch_reasons",
         "label": "이 직무가 나에게 맞지 않을 수 있는 이유 3가지",
-        "rows": 3,
-        "placeholder": "예) 1. 양산 라인 야근 빈도가 높다 — 나는 일과 삶 분리가 중요\n2. 협력사와 갈등 상황이 잦다 — 갈등 관리 경험이 적음\n3. 영문 기술 문서 작성 비중이 30% 이상 — 영어 작문은 약점"
+        "rows": 3
       },
       {
         "key": "no_performance",
         "label": "이 직무에서 성과가 안 나오는 상황",
-        "rows": 2,
-        "placeholder": "예) 1. 매일 같은 검사 SOP만 도는 단순 반복 환경\n2. 협력사가 적극적이지 않을 때 진척이 안 됨\n3. 기술팀이 품질 의견을 안 들어주는 분위기"
+        "rows": 2
       },
       {
         "key": "5year_view",
         "label": "이 직무를 5년 하면 내가 원하는 삶에 가까워지는가, 멀어지는가",
-        "rows": 2,
-        "placeholder": "예) 5년 후: 양산 1~2개 사이클 경험 + 영문 기술 협의 가능 수준\n→ 원하는 삶 [전문성 + 글로벌 경험]에 가까워짐 ✓\n다만 가족 시간은 양산 초기마다 줄어드는 점 감수 필요"
+        "rows": 2
       },
       {
         "key": "quit_reasons",
         "label": "이 직무 퇴사자들의 흔한 이유 3가지 (AI 조사 + 나의 판단)",
-        "rows": 3,
-        "placeholder": "예) 1. 반복 야근 누적 (양산 초기 3개월 집중) — 자동차 업계 공통\n2. 기술팀-품질팀 간 의견 충돌 스트레스 (블라인드 후기 다수)\n3. 협력사 책임 전가 분쟁 시 중간에서 압박 받음\n→ 나의 대응: 1번은 단기 감수 가능, 2~3번은 커뮤니케이션 역량으로 극복"
+        "rows": 3
       }
     ],
     "prompt": {
@@ -638,17 +606,12 @@ const FORMS = [
       "J"
     ],
     "desc": "이력서·자소서에 반드시 들어갈 키워드와 배치 전략을 정리합니다. PART 3/4 워크북으로 넘기기 직전의 다리.",
-    "completion_criteria": "연결 문장 3개 + 이력서 키워드 5개 + 역질문 3개 준비",
+    "completion_criteria": "이력서 키워드 5개 + 역질문 3개 준비",
     "references": [
       {
         "formId": "form_02",
         "label": "직무 용어 분석",
         "showField": "keywords"
-      },
-      {
-        "formId": "form_03",
-        "label": "내 경험 Top 5",
-        "showField": "my_experience_pool"
       },
       {
         "formId": "form_03",
@@ -663,39 +626,22 @@ const FORMS = [
     ],
     "fields": [
       {
-        "key": "experience_translation",
-        "label": "내 경험을 직무 언어로 다시 쓰기 (경험 2~3개)",
-        "hint": "PART 2의 핵심 키워드 / 산업 용어를 사용해서 내 경험을 다시 표현. \"카페 알바\" → \"시간대별 주문 데이터 분석 기반 발주 최적화\"처럼.",
-        "placeholder": "예) 원래 표현: 학회 운영진으로 신입생 멘토링 매칭을 했다\n→ 직무 언어로: 35명 대상 매칭 알고리즘 설계, 만족도 92% 달성 (협업·프로세스 설계 역량)",
-        "rows": 6
-      },
-      {
-        "key": "connection_sentences",
-        "label": "연결 문장 3개 — 자소서·면접 첫 문장 그대로 사용",
-        "hint": "[공고 요건] ↔ [내 경험] ↔ [성과·숫자] 한 문장으로. 자소서 첫 문장이나 면접 \"왜 우리 회사인가요?\" 답변 도입부에 그대로 활용. 본인 직군에 맞는 형식을 골라서 작성.",
-        "placeholder": "▼ 자소서 도입 문장형 (전공/비전공 신입·경력 전환자)\n예) 본 직무가 요구하는 \"데이터 기반 마케팅 의사결정\"은, 제가 OO 인턴 6개월간 GA4·SQL로 캠페인 ROI를 분석해 광고비를 30% 절감한 경험과 직결됩니다.\n\n▼ 작품 매핑형 (포트폴리오 직군 — UX·개발·디자인·기획)\n예) [공고 요구: 유저 리서치 기반 디자인 의사결정]\n→ 졸업작품 「○○○ 앱 리디자인」: 사용자 인터뷰 12명 → 페르소나 3개 도출 → 메인 플로우 재설계 → 태스크 완료율 38% → 71%\n\n▼ 면접 첫 문장형 (서류 합격 후 면접 준비)\n예) Q. \"우리 회사에 왜 지원했나요?\"\nA. \"본 직무의 'A/B 테스트 기반 그로스' 역량은, 제가 사이드로 운영한 유튜브 채널에서 썸네일·인트로를 매주 테스트해 평균 조회수를 2.3배 늘린 경험과 직결됩니다. 그래서…\"\n\n──── 위 형식 참고해서 본인 연결 문장 3개 작성 ────\n1.\n2.\n3.",
-        "rows": 14
-      },
-      {
         "key": "resume_keywords",
         "label": "이력서 필수 키워드 5개 + 배치 섹션",
         "hint": "ATS 통과 + 사람 눈에 띄게",
-        "rows": 5,
-        "placeholder": "예) 1. \"APQP 5단계 이해\" — 자격 섹션 (PPAP, FMEA와 함께 묶어 배치)\n2. \"FEM 시뮬레이션\" — 프로젝트 섹션 (캡스톤 항목 첫 줄)\n3. \"협력사 데이터 분석\" — 인턴 경험 첫 줄\n4. \"IATF 16949\" — 자격 섹션 (관련 교육 수료 표기)\n5. \"영문 기술 협의\" — 외국어 섹션 + 인턴 경험에 분산"
+        "rows": 5
       },
       {
         "key": "essay_angle",
         "label": "자소서 차별화 앵글",
         "hint": "같은 회사 지원자들과 내가 다른 점 한 가지",
-        "rows": 3,
-        "placeholder": "예) 일반 지원자: 이론 강조형 (학점·자격증)\n→ 나의 차별점: \"협력사와 직접 부딪쳐 본 인턴 경험\" — 2개월간 수입검사 데이터로 협력사 3곳과 불량 원인 협의 진행 → 단순 검사원이 아닌 \"협의 가능한 신입\"임을 강조"
+        "rows": 3
       },
       {
         "key": "interview_reverse_q",
         "label": "면접 역질문 3개",
         "hint": "공고의 모호했던 부분 기반",
-        "rows": 3,
-        "placeholder": "예) 1. 공고에 \"글로벌 협력사 대응\"이 있는데, 신입에게 어느 시점부터 영문 협의를 맡기시나요?\n2. 양산 초기 야근 빈도는 분기당 평균 어느 정도이며, 보상 체계는 어떻게 되나요?\n3. 품질-기술 부서 간 의견 차이가 있을 때 어떤 의사결정 프로세스가 있나요?"
+        "rows": 3
       },
       {
         "key": "submit_date",
@@ -735,40 +681,34 @@ const FORMS = [
         "key": "portfolio_format",
         "label": "포트폴리오 형식",
         "hint": "GitHub / Notion / Behance / 개인 사이트 등",
-        "rows": 2,
-        "placeholder": "예) Notion 메인 + GitHub(코드) + Figma(디자인 원본) 조합. 면접관 1분 훑기용 한 페이지 요약 + 2~3개 작품 심층 케이스 스터디 구조"
+        "rows": 2
       },
       {
         "key": "jd_skills",
         "label": "직무상세내용에서 요구하는 기술·도구 리스트",
-        "rows": 3,
-        "placeholder": "예) [필수] Figma, 디자인 시스템 운영, A/B 테스트 결과 해석\n[우대] HTML/CSS 이해, GA4 기본, 모션 디자인(After Effects)\n[도구] Notion, Slack, JIRA 협업 경험"
+        "rows": 3
       },
       {
         "key": "portfolio_works",
         "label": "내 포폴 주요 작업 3~5개 (제목 + 한줄 설명)",
-        "rows": 5,
-        "placeholder": "예) 1. 졸업작품 「OO 앱 리디자인」 — 사용자 인터뷰 12명 기반 메인 플로우 재설계, 태스크 완료율 38%→71%\n2. 부트캠프 팀 프로젝트 「중고책 거래 서비스」 — 4인 팀 PM 겸 디자인 리드, 4주\n3. 외주 「소상공인 브랜딩」 — 카페 1곳 BX 리뉴얼, 클라이언트 만족도 인터뷰 진행\n4. 사이드 「Figma 디자인 시스템 키트」 — Figma Community에 공개, 다운로드 200건"
+        "rows": 5
       },
       {
         "key": "mapping",
         "label": "직무상세내용 요구사항 ↔ 내 작업 매핑",
         "hint": "요구사항 A → 작업 1·2가 해당, 요구사항 B → 작업 3",
-        "rows": 5,
-        "placeholder": "예) [요구사항 A: 유저 리서치 기반 디자인 의사결정]\n→ 작업 1 (졸업작품: 인터뷰 12명 → 페르소나 → 플로우 재설계)\n[요구사항 B: 디자인 시스템 운영]\n→ 작업 4 (Figma 시스템 키트 — 컴포넌트 50개, 토큰 정의)\n[요구사항 C: 협업·문서화]\n→ 작업 2 (PM 경험 — 위클리 스탠드업·디자인 결정 문서화)"
+        "rows": 5
       },
       {
         "key": "gaps",
         "label": "직무상세내용 요구사항 중 내 포폴에 없는 것",
-        "rows": 3,
-        "placeholder": "예) 1. A/B 테스트 실제 수행 경험 없음 (해석만 가능) → 사이드 프로젝트로 1건 진행 예정\n2. 모션 디자인 산출물 없음 (우대사항) → After Effects 강의 2주 학습 후 마이크로 인터랙션 1건 추가 계획\n3. 대규모 사용자 기반 디자인 경험 없음 (전부 학생/소규모)"
+        "rows": 3
       },
       {
         "key": "showcase_plan",
         "label": "상위 3개 작업 심층 설명 계획",
         "hint": "과정·문제 해결·성과 중심",
-        "rows": 4,
-        "placeholder": "예) [작품 1 (졸업작품)] 인터뷰 → 페르소나 도출 → 플로우 재설계 → 결과 검증의 전 과정. 의사결정 근거(인터뷰 인용)와 트레이드오프(왜 A안 대신 B안)를 강조\n[작품 2 (PM 프로젝트)] 팀 의사결정 충돌과 해결 과정 중심. 디자이너가 아닌 PM 시각의 산출물도 보여줌\n[작품 4 (시스템 키트)] 토큰 설계 원칙과 컴포넌트 명명 규칙. 디자인 시스템 사고력 입증"
+        "rows": 4
       }
     ],
     "prompt": null
@@ -976,7 +916,6 @@ const FocusStyles = () => (
     }
     .ce-save-btn:hover, .ce-btn:hover { opacity: 0.88; }
     .ce-card:hover { box-shadow: 0 4px 12px rgba(14, 39, 80,0.08); }
-    @keyframes ce-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   `}</style>
 );
 
@@ -1005,8 +944,6 @@ const JobAnalysisWorkbook = () => {
   const [autoSaveStatus, setAutoSaveStatus] = useState('');
   const [confirmingClear, setConfirmingClear] = useState(false);
   const [clearedFlash, setClearedFlash] = useState(false);
-  const [isSavingDocx, setIsSavingDocx] = useState(false);
-  const [savedDocx, setSavedDocx] = useState(false);
   
   const STORAGE_KEY = 'careerengineer_job_analysis_v1';
   
@@ -1583,7 +1520,6 @@ const JobAnalysisWorkbook = () => {
   });
 
   const downloadFinal = async () => {
-    setIsSavingDocx(true);
     try {
       const docxLib = await loadDocxLib();
       const { Document, Paragraph, TextRun, AlignmentType, BorderStyle, ExternalHyperlink, Packer } = docxLib;
@@ -1815,13 +1751,9 @@ const JobAnalysisWorkbook = () => {
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       setDownloadSuccess(true);
       setTimeout(() => setDownloadSuccess(false), 5000);
-      setSavedDocx(true);
-      setTimeout(() => setSavedDocx(false), 3000);
     } catch (err) {
       console.error('docx 생성 실패:', err);
       alert('워드 문서 생성에 실패했습니다.\n' + (err.message || ''));
-    } finally {
-      setIsSavingDocx(false);
     }
   };
 
@@ -1841,7 +1773,7 @@ const JobAnalysisWorkbook = () => {
     input: { width: '100%', padding: '12px 16px', border: `1px solid ${COLORS.border}`, borderRadius: RADIUS.base, fontSize: FONT.size.base, fontFamily: FONT.family, color: COLORS.accent, outline: 'none', boxSizing: 'border-box', background: COLORS.bg, transition: 'border-color 150ms ease, box-shadow 150ms ease' },
     btnPrimary: { background: COLORS.accent, color: COLORS.white, border: 'none', padding: '14px 20px', borderRadius: RADIUS.base, fontSize: FONT.size.md, fontWeight: FONT.weight.semibold, cursor: 'pointer', fontFamily: FONT.family, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 },
     btnSecondary: { background: 'transparent', color: COLORS.accent, border: `1px solid ${COLORS.border}`, padding: '12px 24px', borderRadius: RADIUS.base, fontSize: FONT.size.base, fontWeight: FONT.weight.medium, cursor: 'pointer', fontFamily: FONT.family, display: 'inline-flex', alignItems: 'center', gap: 6 },
-    btnSaveHeader: { background: COLORS.accent, color: COLORS.white, border: 'none', borderRadius: RADIUS.base, padding: '0 14px', fontSize: FONT.size.sm, fontWeight: FONT.weight.semibold, cursor: 'pointer', fontFamily: FONT.family, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, whiteSpace: 'nowrap', transition: 'opacity 150ms ease', height: 36 },
+    btnSaveHeader: { background: COLORS.accent2, color: COLORS.white, border: 'none', borderRadius: RADIUS.base, padding: '0 14px', fontSize: FONT.size.sm, fontWeight: FONT.weight.semibold, cursor: 'pointer', fontFamily: FONT.family, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, whiteSpace: 'nowrap', transition: 'opacity 150ms ease', height: 36 },
     btnText: { background: 'transparent', color: COLORS.accent2, border: 'none', padding: 0, fontSize: FONT.size.sm, fontWeight: FONT.weight.medium, cursor: 'pointer', fontFamily: FONT.family, display: 'inline-flex', alignItems: 'center', gap: 4 },
     boxTip:     { background: COLORS.yellowBg, border: `1px solid ${COLORS.yellow}33`, color: COLORS.accent, padding: SPACING.md, borderRadius: RADIUS.base, marginBottom: SPACING.md },
     boxWarning: { background: COLORS.redBg,    border: `1px solid ${COLORS.red}33`,    color: COLORS.accent, padding: SPACING.md, borderRadius: RADIUS.base, marginBottom: SPACING.md },
@@ -1853,34 +1785,6 @@ const JobAnalysisWorkbook = () => {
     copyrightWarn: { fontSize: FONT.size.xs, color: COLORS.red, textAlign: 'center', marginTop: 8, fontWeight: FONT.weight.medium, lineHeight: FONT.lineHeight.base },
   };
   const labelStyle = (color) => ({ fontSize: FONT.size.sm, fontWeight: FONT.weight.semibold, color, margin: 0, letterSpacing: 0.5, textTransform: 'uppercase' });
-
-  // 저장 버튼 헬퍼 (career_roadmap의 저장 버튼과 동일한 시각적 상태 표시)
-  // checkData=true이면 hasFormData() 결과에 따라 비활성화 처리 (intro 페이지에서만 사용)
-  const SaveDocxButton = ({ checkData = false }) => {
-    const enabled = !checkData || hasFormData();
-    const baseStyle = checkData
-      ? {...S.btnSaveHeader, opacity: enabled ? 1 : 0.4, cursor: enabled ? 'pointer' : 'not-allowed'}
-      : S.btnSaveHeader;
-    const dynamicStyle = isSavingDocx
-      ? {...baseStyle, background: COLORS.sub, cursor: 'wait', opacity: 0.7}
-      : baseStyle;
-    return (
-      <button
-        onClick={savePartial}
-        disabled={isSavingDocx || (checkData && !enabled)}
-        className="ce-save-btn"
-        style={dynamicStyle}
-        title={!enabled ? '작성을 시작하면 활성화됩니다' : (isSavingDocx ? '문서 생성 중' : '지금까지 작성한 내용을 Word로 저장')}
-      >
-        {isSavingDocx ? (
-          <>
-            <span style={{ display: 'inline-block', width: 12, height: 12, border: '2px solid #ffffff', borderTopColor: 'transparent', borderRadius: '50%', animation: 'ce-spin 0.7s linear infinite' }} />
-            생성 중…
-          </>
-        ) : savedDocx ? '✓ 저장 완료' : '저장 (.docx)'}
-      </button>
-    );
-  };
 
   // ══════════════════ 인트로 ══════════════════
       const renderIntro = () => (
@@ -1937,7 +1841,9 @@ const JobAnalysisWorkbook = () => {
             <button onClick={clearSavedData} disabled={clearedFlash} style={{ background: confirmingClear ? '#C9A86A' : clearedFlash ? '#E8F5F0' : autoSaveStatus ? '#F0F9F5' : 'transparent', color: confirmingClear ? '#fff' : clearedFlash ? '#1FA47A' : autoSaveStatus ? '#1FA47A' : '#6E7A8F', border: confirmingClear ? '1px solid #C9A86A' : clearedFlash ? '1px solid #1FA47A' : autoSaveStatus ? '1px solid #1FA47A66' : '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 11, fontWeight: 600, cursor: clearedFlash ? 'default' : 'pointer', whiteSpace: 'pre-line', fontFamily: 'inherit', lineHeight: 1.15, width: 140, height: 36, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} title={clearedFlash ? '기록 삭제됨' : confirmingClear ? '한번 더 클릭하면 기록이 삭제됩니다' : '저장된 작성 내용 기록을 삭제 (페이지 유지)'}>
               {confirmingClear ? '기록을 삭제\n하시겠습니까?' : clearedFlash ? '✓ 기록 삭제됨' : autoSaveStatus ? autoSaveStatus : '기록 삭제하고\n다시 작성'}
             </button>
-            <SaveDocxButton checkData={true} />
+            <button disabled={!hasFormData()} onClick={savePartial} className="ce-save-btn" style={{...S.btnSaveHeader, opacity: hasFormData() ? 1 : 0.4, cursor: hasFormData() ? 'pointer' : 'not-allowed'}} title={hasFormData() ? "지금까지 작성한 내용을 Word로 저장" : "작성을 시작하면 활성화됩니다"}>
+              저장 (.docx)
+            </button>
           </div>
         </div>
 
@@ -2048,7 +1954,9 @@ const JobAnalysisWorkbook = () => {
               <button onClick={clearSavedData} disabled={clearedFlash} style={{ background: confirmingClear ? '#C9A86A' : clearedFlash ? '#E8F5F0' : autoSaveStatus ? '#F0F9F5' : 'transparent', color: confirmingClear ? '#fff' : clearedFlash ? '#1FA47A' : autoSaveStatus ? '#1FA47A' : '#6E7A8F', border: confirmingClear ? '1px solid #C9A86A' : clearedFlash ? '1px solid #1FA47A' : autoSaveStatus ? '1px solid #1FA47A66' : '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 11, fontWeight: 600, cursor: clearedFlash ? 'default' : 'pointer', whiteSpace: 'pre-line', fontFamily: 'inherit', lineHeight: 1.15, width: 140, height: 36, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} title={clearedFlash ? '기록 삭제됨' : confirmingClear ? '한번 더 클릭하면 기록이 삭제됩니다' : '저장된 작성 내용 기록을 삭제 (페이지 유지)'}>
                 {confirmingClear ? '기록을 삭제\n하시겠습니까?' : clearedFlash ? '✓ 기록 삭제됨' : autoSaveStatus ? autoSaveStatus : '기록 삭제하고\n다시 작성'}
               </button>
-              <SaveDocxButton />
+              <button onClick={savePartial} className="ce-save-btn" style={S.btnSaveHeader}>
+                저장 (.docx)
+              </button>
             </div>
           </div>
 
@@ -2155,7 +2063,9 @@ const JobAnalysisWorkbook = () => {
               <button onClick={clearSavedData} disabled={clearedFlash} style={{ background: confirmingClear ? '#C9A86A' : clearedFlash ? '#E8F5F0' : autoSaveStatus ? '#F0F9F5' : 'transparent', color: confirmingClear ? '#fff' : clearedFlash ? '#1FA47A' : autoSaveStatus ? '#1FA47A' : '#6E7A8F', border: confirmingClear ? '1px solid #C9A86A' : clearedFlash ? '1px solid #1FA47A' : autoSaveStatus ? '1px solid #1FA47A66' : '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 11, fontWeight: 600, cursor: clearedFlash ? 'default' : 'pointer', whiteSpace: 'pre-line', fontFamily: 'inherit', lineHeight: 1.15, width: 140, height: 36, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} title={clearedFlash ? '기록 삭제됨' : confirmingClear ? '한번 더 클릭하면 기록이 삭제됩니다' : '저장된 작성 내용 기록을 삭제 (페이지 유지)'}>
                 {confirmingClear ? '기록을 삭제\n하시겠습니까?' : clearedFlash ? '✓ 기록 삭제됨' : autoSaveStatus ? autoSaveStatus : '기록 삭제하고\n다시 작성'}
               </button>
-              <SaveDocxButton />
+              <button onClick={savePartial} className="ce-save-btn" style={S.btnSaveHeader}>
+                저장 (.docx)
+              </button>
             </div>
           </div>
 
@@ -2339,7 +2249,9 @@ const JobAnalysisWorkbook = () => {
             <button onClick={clearSavedData} disabled={clearedFlash} style={{ background: confirmingClear ? '#C9A86A' : clearedFlash ? '#E8F5F0' : autoSaveStatus ? '#F0F9F5' : 'transparent', color: confirmingClear ? '#fff' : clearedFlash ? '#1FA47A' : autoSaveStatus ? '#1FA47A' : '#6E7A8F', border: confirmingClear ? '1px solid #C9A86A' : clearedFlash ? '1px solid #1FA47A' : autoSaveStatus ? '1px solid #1FA47A66' : '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 11, fontWeight: 600, cursor: clearedFlash ? 'default' : 'pointer', whiteSpace: 'pre-line', fontFamily: 'inherit', lineHeight: 1.15, width: 140, height: 36, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} title={clearedFlash ? '기록 삭제됨' : confirmingClear ? '한번 더 클릭하면 기록이 삭제됩니다' : '저장된 작성 내용 기록을 삭제 (페이지 유지)'}>
               {confirmingClear ? '기록을 삭제\n하시겠습니까?' : clearedFlash ? '✓ 기록 삭제됨' : autoSaveStatus ? autoSaveStatus : '기록 삭제하고\n다시 작성'}
             </button>
-            <SaveDocxButton checkData={true} />
+            <button disabled={!hasFormData()} onClick={savePartial} className="ce-save-btn" style={{...S.btnSaveHeader, opacity: hasFormData() ? 1 : 0.4, cursor: hasFormData() ? 'pointer' : 'not-allowed'}} title={hasFormData() ? "지금까지 작성한 내용을 Word로 저장" : "작성을 시작하면 활성화됩니다"}>
+              저장 (.docx)
+            </button>
           </div>
         </div>
 
