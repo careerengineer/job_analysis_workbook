@@ -284,8 +284,8 @@ const RelatedWorkbookList = ({ items, title = '함께 보면 좋은 워크북' }
 const FORMS = [
   {
     "id": "form_01",
-    "title": "공고 기본 정보 파악",
-    "subtitle": "PART 1 — 공고의 뼈대 수집",
+    "title": "지원할 회사·직무 기본 정보",
+    "subtitle": "PART 1 — 지원하는 한 회사·직무 정리",
     "type": "repeat",
     "required_for": [
       "A",
@@ -299,8 +299,8 @@ const FORMS = [
       "I",
       "J"
     ],
-    "desc": "지원하려는 채용공고의 기본 정보를 공고별로 입력하세요. 10개 이상 입력하면 패턴이 보입니다.",
-    "completion_criteria": "공고 10개 이상 입력",
+    "desc": "이번에 지원하려는 한 회사의 채용공고를 기준으로 입력하세요. 여러 회사를 늘어놓기보다 지원하는 한 회사·한 직무에 집중해 깊이 분석하는 것이 합격에 훨씬 효과적입니다. (정말 비교가 필요할 때만 아래 [비교할 공고 추가]로 덧붙이세요.)",
+    "completion_criteria": "지원할 회사·직무 기본 정보 입력",
     "references": [],
     "fields": [
       {
@@ -358,8 +358,8 @@ const FORMS = [
       "I",
       "J"
     ],
-    "desc": "공고에서 반복되거나 낯선 용어를 AI와 함께 분석합니다. 용어의 실무적 의미를 파악하는 단계입니다.",
-    "completion_criteria": "핵심 키워드 3~5개 + 용어 의미 + 주요 업무 흐름 정리",
+    "desc": "지원하려는 이 회사 공고의 '주요 업무(직무상세내용)'를 항목별로 분해하고, 낯선 용어를 AI와 함께 분석합니다. 분해한 직무상세내용 항목은 STEP 2 경험정리에서 내 경험과 1:1로 매핑됩니다.",
+    "completion_criteria": "주요 업무(직무상세내용) 항목별 분해 + 용어 의미 + 업무 흐름 정리",
     "references": [
       {
         "formId": "form_01",
@@ -369,9 +369,15 @@ const FORMS = [
     ],
     "fields": [
       {
+        "key": "jd_duties",
+        "label": "이 회사 공고의 '주요 업무(직무상세내용)'를 한 줄에 하나씩 적어주세요",
+        "hint": "공고의 '담당업무 / 주요업무 / Responsibilities' 항목을 한 줄에 하나씩 분해하세요. 이 한 줄 한 줄이 STEP 2 경험정리에서 '내 어떤 경험이 이 일을 해봤는가'와 1:1로 매핑됩니다. 한 회사·한 직무 기준으로 구체적으로.",
+        "rows": 6
+      },
+      {
         "key": "keywords",
-        "label": "반복되는 핵심 키워드 3~5개",
-        "hint": "공고를 읽으면서 여러 번 등장하는 용어",
+        "label": "(여러 공고를 봤다면) 반복 등장하는 핵심 키워드 3~5개 — 선택",
+        "hint": "여러 공고를 비교했을 때 3회 이상 반복된 단어. 반복 = 이 직무의 핵심 역량 신호 (이력서·자소서에 그대로 쓸 단어). 한 회사만 분석한다면 비워둬도 됩니다.",
         "rows": 2
       },
       {
@@ -388,7 +394,8 @@ const FORMS = [
       },
       {
         "key": "daily_vs_periodic",
-        "label": "매일 하는 일 vs 분기별로 하는 일 구분",
+        "label": "이 직무가 매일 하는 일과 분기·연 단위로 하는 일은 각각 무엇인가?",
+        "hint": "매일 반복하는 일이 이 직무의 '실제 일상'. 그 일상이 견딜 만한지 보는 단계",
         "rows": 3
       }
     ],
@@ -491,7 +498,8 @@ const FORMS = [
     "fields": [
       {
         "key": "vision",
-        "label": "기업 비전·미션",
+        "label": "이 기업의 비전·미션은? (내 지원동기와 연결될 한 문장 찾기)",
+        "hint": "채용/IR 페이지 원문을 적고, 그 중 내 가치관·목표와 이어지는 한 문장을 고른다",
         "rows": 2
       },
       {
@@ -508,12 +516,14 @@ const FORMS = [
       },
       {
         "key": "competitors",
-        "label": "주요 경쟁사 2~3개 + 경쟁 포인트",
+        "label": "주요 경쟁사 2~3개와, 이 회사가 경쟁사보다 잘하는 점은?",
+        "hint": "경쟁사 대비 강점 = 지원동기의 재료 ('왜 다른 곳 아닌 여기인가'에 대한 답)",
         "rows": 3
       },
       {
         "key": "recent_news",
-        "label": "최근 3개월 주요 뉴스 (검증된 것만)",
+        "label": "최근 3개월 주요 뉴스는? (출처가 확인된 것만)",
+        "hint": "보도자료·공식발표 등 출처 있는 것만. 면접에서 인용할 수 있을 정도로 정확하게",
         "rows": 3
       },
       {
@@ -561,27 +571,32 @@ const FORMS = [
     "fields": [
       {
         "key": "energy_check",
-        "label": "핵심 업무 3개 중 에너지가 빠지는 것 / 올라가는 것",
+        "label": "핵심 업무 3가지 중, 하고 싶어 에너지가 오르는 일과 생각만 해도 지치는 일은?",
+        "hint": "PART 2에서 정리한 주요 업무를 떠올려보세요. 끌리는 일 vs 피하고 싶은 일을 구분",
         "rows": 3
       },
       {
         "key": "mismatch_reasons",
-        "label": "이 직무가 나에게 맞지 않을 수 있는 이유 3가지",
+        "label": "솔직히, 이 직무가 나와 안 맞을 수도 있는 이유 3가지는?",
+        "hint": "좋은 점 말고 '걸리는 점'만. 합격해도 힘들 수 있는 지점을 미리 알아두는 단계",
         "rows": 3
       },
       {
         "key": "no_performance",
-        "label": "이 직무에서 성과가 안 나오는 상황",
-        "rows": 2
+        "label": "내가 이 직무에서 성과를 내기 어려운 환경·조건은?",
+        "hint": "어떤 상황이면 내가 힘을 못 쓸까? 예: 혼자 묵묵히 처리해야 할 때 / 부서 협조가 안 될 때 / 정답 없이 모호할 때. → 입사 후 미리 대비할 지점",
+        "rows": 3
       },
       {
         "key": "5year_view",
-        "label": "이 직무를 5년 하면 내가 원하는 삶에 가까워지는가, 멀어지는가",
-        "rows": 2
+        "label": "이 직무를 5년 한 나의 모습은 내가 원하는 삶에 가까운가, 먼가? (이유와 함께)",
+        "hint": "5년 뒤에도 이 일을 하는 나를 상상 → 가까워지면 지원 신호, 멀어지면 재검토 신호",
+        "rows": 3
       },
       {
         "key": "quit_reasons",
-        "label": "이 직무 퇴사자들의 흔한 이유 3가지 (AI 조사 + 나의 판단)",
+        "label": "이 직무를 그만두는 사람들의 흔한 이유 3가지와, 그 중 나에게도 해당될 것 같은 것은?",
+        "hint": "AI에게 'OO 직무 퇴사 사유'를 묻고, 그 중 내게도 해당될 위험을 표시. 모르면 입사 후 후회한다",
         "rows": 3
       }
     ],
@@ -715,6 +730,7 @@ const FORMS = [
   }
 ];
 
+
 const PERSONAS = {
   "A": {
     "title": "문과/비전공 전환자",
@@ -737,7 +753,7 @@ const PERSONAS = {
   "D": {
     "title": "직무 미정자",
     "desc": "직무 미정 — 채용공고 분석으로 가능성 있는 직무 후보를 좁히고 방향 잡기",
-    "flow": "STEP 0 (취업준비 진단) + 직무탐색 자료 먼저 완료 → 공고 수집 → 용어 분석",
+    "flow": "STEP 0 (취업 로드맵 진단) + 직무탐색 자료 먼저 완료 → 공고 수집 → 용어 분석",
     "step0_warning": true
   },
   "E": {
@@ -773,10 +789,11 @@ const PERSONAS = {
   "J": {
     "title": "저학년/비취준생",
     "desc": "취업 준비 시작 — 채용공고 읽는 법부터 익히고 직무에 대한 감 잡기",
-    "flow": "STEP 0 (취업준비 진단) 먼저 완료 → 채용담당자 시각 이해 → 공고 수집",
+    "flow": "STEP 0 (취업 로드맵 진단) 먼저 완료 → 채용담당자 시각 이해 → 공고 수집",
     "step0_warning": true
   }
 };
+
 
 const DIAGNOSIS = [
   {
@@ -874,7 +891,7 @@ const DIAGNOSIS = [
   }
 ];
 
-const COMPLETION_CHECKLIST = ["공고 10개 이상 분석했는가?", "이 직무의 핵심 역량 3가지를 한 문장으로 말할 수 있는가?", "내가 가진 것 vs 부족한 것을 구분했는가?", "이 직무가 나에게 맞는지 스스로 판단했는가?", "이력서·자소서에 넣을 키워드가 정리되었는가?", "면접 역질문 3개가 준비되었는가?"];
+const COMPLETION_CHECKLIST = ["지원할 회사·직무의 '주요 업무(직무상세내용)'를 항목별로 분해했는가?", "각 직무상세내용 항목을 STEP 2 경험정리에서 내 경험과 매핑할 수 있는가?", "이 직무의 핵심 역량 3가지를 한 문장으로 말할 수 있는가?", "내가 가진 것 vs 부족한 것을 구분했는가?", "이 직무가 나에게 맞는지 스스로 판단했는가?", "이력서·자소서에 넣을 키워드가 정리되었는가?", "면접 역질문 3개가 준비되었는가?"];
   const FirstVisitModal = ({ open, onClose, title, steps }) => {
     if (!open) return null;
     return (
@@ -1732,6 +1749,14 @@ const JobAnalysisWorkbook = () => {
         indent: { left: 240 }
       }));
       children.push(linkP('전체 상품 보기 (클릭)', 'https://www.latpeed.com/stores/eqxhZ', { before: 80, after: 160, indent: 240 }));
+
+      // ［저작권·기밀 안내］ — 저장 문서 최상단 삽입 (대시보드 docx와 동일 문구)
+      children.unshift(
+        new Paragraph({ children: [new TextRun({ text: '［저작권·기밀 안내 / Confidential］', bold: true, size: 20, font: '맑은 고딕', color: 'B00020' })], spacing: { after: 60 } }),
+        new Paragraph({ children: [new TextRun({ text: '이 문서에 사용된 워크북의 구성·질문·예시 등 모든 콘텐츠의 저작권은 CareerEngineer에게 있습니다. 사전 서면 동의 없이 본 문서 및 워크북의 질문·구성을 복제·배포·공유·게시·2차 가공하거나 외부로 유출할 수 없습니다. 무단 사용·유출 시 관련 법령에 따라 민·형사상 책임을 물을 수 있습니다.', size: 16, font: '맑은 고딕', color: '595959' })], spacing: { after: 40 } }),
+        new Paragraph({ children: [new TextRun({ text: 'ⓒ 2026 CareerEngineer. All rights reserved.', size: 16, font: '맑은 고딕', color: '595959', italics: true })], spacing: { after: 60 } }),
+        new Paragraph({ children: [new TextRun({ text: '────────────────────────────', size: 14, font: '맑은 고딕', color: 'CCCCCC' })], spacing: { after: 120 } }),
+      );
 
       const doc = new Document({
         creator: '',
