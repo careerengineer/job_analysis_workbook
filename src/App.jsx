@@ -9,7 +9,7 @@ const MENTORING_URLS = {
   interview:         'https://www.latpeed.com/products/tZ5xw',  // 면접 멘토링
 };
 const COLORS = {
-  accent:  '#0E2750', accent2: '#C9A86A', sub: '#6E7A8F', border: '#6E7A8F33',
+  accent:  '#0E2750', accent2: '#C9A86A', sub: '#565F72', border: '#6E7A8F33',
   bg: '#ffffff', bgAlt: '#F2F1EC', white: '#ffffff',
   green: '#C9A86A', greenBg: '#FBFAF6',
   red: '#0E2750', redBg: '#F2F1EC',
@@ -80,7 +80,7 @@ const _INTRO_INK = '#0E2750';
 const _INTRO_INK2 = '#1B3A6B';
 const _INTRO_PAPER = '#F2F1EC';
 const _INTRO_GOLD = '#C9A86A';
-const _INTRO_MUTE = '#6E7A8F';
+const _INTRO_MUTE = '#565F72';
 
 const BrandHero = () => (
   <div style={{ textAlign: 'center', marginBottom: 24, paddingTop: 12 }}>
@@ -1898,8 +1898,8 @@ const JobAnalysisWorkbook = () => {
               </button>
               <StepNavigatorDropdown open={showStepNav} onClose={() => setShowStepNav(false)} currentKey="job_analysis" />
             </div>
-            <button onClick={goHome} title="처음 페이지로 이동 (작성 내용 유지)" style={{ background: 'transparent', color: '#6E7A8F', border: '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 14, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit', height: 36, display: 'inline-flex', alignItems: 'center' }}>처음으로</button>
-            <button onClick={clearSavedData} disabled={clearedFlash} style={{ background: confirmingClear ? '#C9A86A' : clearedFlash ? '#E8F5F0' : autoSaveStatus ? '#F0F9F5' : 'transparent', color: confirmingClear ? '#fff' : clearedFlash ? '#1FA47A' : autoSaveStatus ? '#1FA47A' : '#6E7A8F', border: confirmingClear ? '1px solid #C9A86A' : clearedFlash ? '1px solid #1FA47A' : autoSaveStatus ? '1px solid #1FA47A66' : '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 11, fontWeight: 600, cursor: clearedFlash ? 'default' : 'pointer', whiteSpace: 'pre-line', fontFamily: 'inherit', lineHeight: 1.15, width: 140, height: 36, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} title={clearedFlash ? '기록 삭제됨' : confirmingClear ? '한번 더 클릭하면 기록이 삭제됩니다' : '저장된 작성 내용 기록을 삭제 (페이지 유지)'}>
+            <button onClick={goHome} title="처음 페이지로 이동 (작성 내용 유지)" style={{ background: 'transparent', color: '#565F72', border: '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 14, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit', height: 36, display: 'inline-flex', alignItems: 'center' }}>처음으로</button>
+            <button onClick={clearSavedData} disabled={clearedFlash} style={{ background: confirmingClear ? '#C9A86A' : clearedFlash ? '#E8F5F0' : autoSaveStatus ? '#F0F9F5' : 'transparent', color: confirmingClear ? '#fff' : clearedFlash ? '#1FA47A' : autoSaveStatus ? '#1FA47A' : '#565F72', border: confirmingClear ? '1px solid #C9A86A' : clearedFlash ? '1px solid #1FA47A' : autoSaveStatus ? '1px solid #1FA47A66' : '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 11, fontWeight: 600, cursor: clearedFlash ? 'default' : 'pointer', whiteSpace: 'pre-line', fontFamily: 'inherit', lineHeight: 1.15, width: 140, height: 36, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} title={clearedFlash ? '기록 삭제됨' : confirmingClear ? '한번 더 클릭하면 기록이 삭제됩니다' : '저장된 작성 내용 기록을 삭제 (페이지 유지)'}>
               {confirmingClear ? '기록을 삭제\n하시겠습니까?' : clearedFlash ? '✓ 기록 삭제됨' : autoSaveStatus ? autoSaveStatus : '기록 삭제하고\n다시 작성'}
             </button>
             <button disabled={!hasFormData()} onClick={savePartial} className="ce-save-btn" style={{...S.btnSaveHeader, opacity: hasFormData() ? 1 : 0.4, cursor: hasFormData() ? 'pointer' : 'not-allowed'}} title={hasFormData() ? "지금까지 작성한 내용을 Word로 저장" : "작성을 시작하면 활성화됩니다"}>
@@ -2011,8 +2011,8 @@ const JobAnalysisWorkbook = () => {
               </button>
               <StepNavigatorDropdown open={showStepNav} onClose={() => setShowStepNav(false)} currentKey="job_analysis" />
             </div>
-              <button onClick={goHome} title="처음 페이지로 이동 (작성 내용 유지)" style={{ background: 'transparent', color: '#6E7A8F', border: '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 14, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit', height: 36, display: 'inline-flex', alignItems: 'center' }}>처음으로</button>
-              <button onClick={clearSavedData} disabled={clearedFlash} style={{ background: confirmingClear ? '#C9A86A' : clearedFlash ? '#E8F5F0' : autoSaveStatus ? '#F0F9F5' : 'transparent', color: confirmingClear ? '#fff' : clearedFlash ? '#1FA47A' : autoSaveStatus ? '#1FA47A' : '#6E7A8F', border: confirmingClear ? '1px solid #C9A86A' : clearedFlash ? '1px solid #1FA47A' : autoSaveStatus ? '1px solid #1FA47A66' : '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 11, fontWeight: 600, cursor: clearedFlash ? 'default' : 'pointer', whiteSpace: 'pre-line', fontFamily: 'inherit', lineHeight: 1.15, width: 140, height: 36, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} title={clearedFlash ? '기록 삭제됨' : confirmingClear ? '한번 더 클릭하면 기록이 삭제됩니다' : '저장된 작성 내용 기록을 삭제 (페이지 유지)'}>
+              <button onClick={goHome} title="처음 페이지로 이동 (작성 내용 유지)" style={{ background: 'transparent', color: '#565F72', border: '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 14, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit', height: 36, display: 'inline-flex', alignItems: 'center' }}>처음으로</button>
+              <button onClick={clearSavedData} disabled={clearedFlash} style={{ background: confirmingClear ? '#C9A86A' : clearedFlash ? '#E8F5F0' : autoSaveStatus ? '#F0F9F5' : 'transparent', color: confirmingClear ? '#fff' : clearedFlash ? '#1FA47A' : autoSaveStatus ? '#1FA47A' : '#565F72', border: confirmingClear ? '1px solid #C9A86A' : clearedFlash ? '1px solid #1FA47A' : autoSaveStatus ? '1px solid #1FA47A66' : '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 11, fontWeight: 600, cursor: clearedFlash ? 'default' : 'pointer', whiteSpace: 'pre-line', fontFamily: 'inherit', lineHeight: 1.15, width: 140, height: 36, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} title={clearedFlash ? '기록 삭제됨' : confirmingClear ? '한번 더 클릭하면 기록이 삭제됩니다' : '저장된 작성 내용 기록을 삭제 (페이지 유지)'}>
                 {confirmingClear ? '기록을 삭제\n하시겠습니까?' : clearedFlash ? '✓ 기록 삭제됨' : autoSaveStatus ? autoSaveStatus : '기록 삭제하고\n다시 작성'}
               </button>
               <button onClick={savePartial} className="ce-save-btn" style={S.btnSaveHeader}>
@@ -2120,8 +2120,8 @@ const JobAnalysisWorkbook = () => {
               </button>
               <StepNavigatorDropdown open={showStepNav} onClose={() => setShowStepNav(false)} currentKey="job_analysis" />
             </div>
-              <button onClick={goHome} title="처음 페이지로 이동 (작성 내용 유지)" style={{ background: 'transparent', color: '#6E7A8F', border: '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 14, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit', height: 36, display: 'inline-flex', alignItems: 'center' }}>처음으로</button>
-              <button onClick={clearSavedData} disabled={clearedFlash} style={{ background: confirmingClear ? '#C9A86A' : clearedFlash ? '#E8F5F0' : autoSaveStatus ? '#F0F9F5' : 'transparent', color: confirmingClear ? '#fff' : clearedFlash ? '#1FA47A' : autoSaveStatus ? '#1FA47A' : '#6E7A8F', border: confirmingClear ? '1px solid #C9A86A' : clearedFlash ? '1px solid #1FA47A' : autoSaveStatus ? '1px solid #1FA47A66' : '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 11, fontWeight: 600, cursor: clearedFlash ? 'default' : 'pointer', whiteSpace: 'pre-line', fontFamily: 'inherit', lineHeight: 1.15, width: 140, height: 36, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} title={clearedFlash ? '기록 삭제됨' : confirmingClear ? '한번 더 클릭하면 기록이 삭제됩니다' : '저장된 작성 내용 기록을 삭제 (페이지 유지)'}>
+              <button onClick={goHome} title="처음 페이지로 이동 (작성 내용 유지)" style={{ background: 'transparent', color: '#565F72', border: '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 14, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit', height: 36, display: 'inline-flex', alignItems: 'center' }}>처음으로</button>
+              <button onClick={clearSavedData} disabled={clearedFlash} style={{ background: confirmingClear ? '#C9A86A' : clearedFlash ? '#E8F5F0' : autoSaveStatus ? '#F0F9F5' : 'transparent', color: confirmingClear ? '#fff' : clearedFlash ? '#1FA47A' : autoSaveStatus ? '#1FA47A' : '#565F72', border: confirmingClear ? '1px solid #C9A86A' : clearedFlash ? '1px solid #1FA47A' : autoSaveStatus ? '1px solid #1FA47A66' : '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 11, fontWeight: 600, cursor: clearedFlash ? 'default' : 'pointer', whiteSpace: 'pre-line', fontFamily: 'inherit', lineHeight: 1.15, width: 140, height: 36, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} title={clearedFlash ? '기록 삭제됨' : confirmingClear ? '한번 더 클릭하면 기록이 삭제됩니다' : '저장된 작성 내용 기록을 삭제 (페이지 유지)'}>
                 {confirmingClear ? '기록을 삭제\n하시겠습니까?' : clearedFlash ? '✓ 기록 삭제됨' : autoSaveStatus ? autoSaveStatus : '기록 삭제하고\n다시 작성'}
               </button>
               <button onClick={savePartial} className="ce-save-btn" style={S.btnSaveHeader}>
@@ -2316,8 +2316,8 @@ const JobAnalysisWorkbook = () => {
               </button>
               <StepNavigatorDropdown open={showStepNav} onClose={() => setShowStepNav(false)} currentKey="job_analysis" />
             </div>
-            <button onClick={goHome} title="처음 페이지로 이동 (작성 내용 유지)" style={{ background: 'transparent', color: '#6E7A8F', border: '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 14, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit', height: 36, display: 'inline-flex', alignItems: 'center' }}>처음으로</button>
-            <button onClick={clearSavedData} disabled={clearedFlash} style={{ background: confirmingClear ? '#C9A86A' : clearedFlash ? '#E8F5F0' : autoSaveStatus ? '#F0F9F5' : 'transparent', color: confirmingClear ? '#fff' : clearedFlash ? '#1FA47A' : autoSaveStatus ? '#1FA47A' : '#6E7A8F', border: confirmingClear ? '1px solid #C9A86A' : clearedFlash ? '1px solid #1FA47A' : autoSaveStatus ? '1px solid #1FA47A66' : '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 11, fontWeight: 600, cursor: clearedFlash ? 'default' : 'pointer', whiteSpace: 'pre-line', fontFamily: 'inherit', lineHeight: 1.15, width: 140, height: 36, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} title={clearedFlash ? '기록 삭제됨' : confirmingClear ? '한번 더 클릭하면 기록이 삭제됩니다' : '저장된 작성 내용 기록을 삭제 (페이지 유지)'}>
+            <button onClick={goHome} title="처음 페이지로 이동 (작성 내용 유지)" style={{ background: 'transparent', color: '#565F72', border: '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 14, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit', height: 36, display: 'inline-flex', alignItems: 'center' }}>처음으로</button>
+            <button onClick={clearSavedData} disabled={clearedFlash} style={{ background: confirmingClear ? '#C9A86A' : clearedFlash ? '#E8F5F0' : autoSaveStatus ? '#F0F9F5' : 'transparent', color: confirmingClear ? '#fff' : clearedFlash ? '#1FA47A' : autoSaveStatus ? '#1FA47A' : '#565F72', border: confirmingClear ? '1px solid #C9A86A' : clearedFlash ? '1px solid #1FA47A' : autoSaveStatus ? '1px solid #1FA47A66' : '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 11, fontWeight: 600, cursor: clearedFlash ? 'default' : 'pointer', whiteSpace: 'pre-line', fontFamily: 'inherit', lineHeight: 1.15, width: 140, height: 36, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} title={clearedFlash ? '기록 삭제됨' : confirmingClear ? '한번 더 클릭하면 기록이 삭제됩니다' : '저장된 작성 내용 기록을 삭제 (페이지 유지)'}>
               {confirmingClear ? '기록을 삭제\n하시겠습니까?' : clearedFlash ? '✓ 기록 삭제됨' : autoSaveStatus ? autoSaveStatus : '기록 삭제하고\n다시 작성'}
             </button>
             <button disabled={!hasFormData()} onClick={savePartial} className="ce-save-btn" style={{...S.btnSaveHeader, opacity: hasFormData() ? 1 : 0.4, cursor: hasFormData() ? 'pointer' : 'not-allowed'}} title={hasFormData() ? "지금까지 작성한 내용을 Word로 저장" : "작성을 시작하면 활성화됩니다"}>
@@ -2421,7 +2421,7 @@ const JobAnalysisWorkbook = () => {
   onMouseLeave={e => e.currentTarget.style.opacity = 1}>1:1 멘토링</a>을 이용하세요.</p>
             </div>
 
-            <button onClick={goHome} title="처음 페이지로 이동 (작성 내용 유지)" style={{ background: 'transparent', color: '#6E7A8F', border: '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 14, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit', height: 36, display: 'inline-flex', alignItems: 'center' }}>처음으로</button>
+            <button onClick={goHome} title="처음 페이지로 이동 (작성 내용 유지)" style={{ background: 'transparent', color: '#565F72', border: '1px solid #6E7A8F66', borderRadius: 10, padding: '0 14px', fontSize: 14, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit', height: 36, display: 'inline-flex', alignItems: 'center' }}>처음으로</button>
 
             <button onClick={downloadFinal} style={{ ...S.btnPrimary, width: '100%', padding: '18px 32px', fontSize: FONT.size.lg, marginTop: SPACING.md }} className="ce-btn">
               전체 분석 다운로드 (.doc)
